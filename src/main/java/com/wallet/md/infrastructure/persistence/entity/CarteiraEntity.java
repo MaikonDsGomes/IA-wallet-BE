@@ -25,12 +25,9 @@ public class CarteiraEntity {
     @Column(name = "valor_total", nullable = false, precision = 15, scale = 2)
     private BigDecimal valorTotal;
 
-    @Column(name = "ultimo_calculo", nullable = false, precision = 15, scale = 2)
-    private BigDecimal ultimoCalculo;
-
     @PrePersist
     protected void onCreate() {
         if (valorTotal == null) valorTotal = BigDecimal.ZERO;
-        if (ultimoCalculo == null) ultimoCalculo = BigDecimal.ZERO;
+
     }
 }

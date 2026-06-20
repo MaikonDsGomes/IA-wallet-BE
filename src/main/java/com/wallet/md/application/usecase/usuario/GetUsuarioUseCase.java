@@ -18,9 +18,5 @@ public class GetUsuarioUseCase {
         return usuarioMapper.toResponse(usuario);
     }
 
-    public String getPerfilRisco(Long id) {
-        var usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário", id));
 
-    }
 }

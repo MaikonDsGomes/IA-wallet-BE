@@ -2,8 +2,13 @@ package com.wallet.md.infrastructure.config;
 
 import com.wallet.md.application.mapper.UsuarioMapper;
 import com.wallet.md.application.usecase.*;
+import com.wallet.md.application.usecase.carteira.GetScoreCarteiraUseCase;
 import com.wallet.md.application.usecase.usuario.*;
 import com.wallet.md.domain.repository.UsuarioRepository;
+import com.wallet.md.domain.repository.carteira.CarteiraRepository;
+import com.wallet.md.domain.repository.carteira.ContaRepository;
+import com.wallet.md.domain.repository.carteira.PerfilRiscoRepository;
+import com.wallet.md.domain.repository.carteira.ScoreCarteiraRepository;
 import com.wallet.md.domain.service.PasswordEncoderService;
 import com.wallet.md.domain.service.TokenProvider;
 import org.springframework.context.annotation.Bean;
@@ -41,12 +46,17 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public UpdateUsuarioUseCase updateUsuarioUseCase(UsuarioRepository repo, UsuarioMapper mapper) {
-        return new UpdateUsuarioUseCase(repo, mapper);
+    public UpdateUsuarioUseCase updateUsuarioUseCase(UsuarioRepository repo, UsuarioMapper mapper, PasswordEncoderService PasswordEncoderService) {
+        return new UpdateUsuarioUseCase(repo, mapper, PasswordEncoderService);
     }
 
     @Bean
     public DeleteUsuarioUseCase deleteUsuarioUseCase(UsuarioRepository repo) {
         return new DeleteUsuarioUseCase(repo);
+    }
+
+    @Bean
+    public GetScoreCarteiraUseCase getScoreCarteiraUseCase(ContaRepository contaRepository, CarteiraRepository carteiraRepository, ScoreCarteiraRepository scoreCarteiraRepository) {
+        return new GetScoreCarteiraUseCase(contaRepository, carteiraRepository, scoreCarteiraRepository);
     }
 }

@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import static com.wallet.md.presentation.utils.AuthUtils.extractUserId;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/usuarios")
 @RequiredArgsConstructor
 @Tag(name = "Usuários", description = "CRUD de usuários")
 public class UsuarioController {
@@ -81,12 +81,5 @@ public class UsuarioController {
         return ResponseEntity.ok(ApiResponse.success("Usuário deletado com sucesso", null));
     }
 
-    @GetMapping("/me/perfil-risco")
-    @Operation(summary = "Obter perfil de risco do usuário autenticado")
-    public ResponseEntity<ApiResponse<String>> getPerfilRisco(@AuthenticationPrincipal UserDetails userDetails) {
-        Long id = extractUserId(userDetails);
-        String perfilRisco = getUsuarioUseCase.getPerfilRisco(id);
-        return ResponseEntity.ok(ApiResponse.success("Perfil de risco obtido com sucesso", perfilRisco));
-    }
 
 }
