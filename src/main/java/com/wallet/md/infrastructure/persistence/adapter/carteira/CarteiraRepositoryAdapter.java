@@ -22,7 +22,8 @@ public class CarteiraRepositoryAdapter implements CarteiraRepository {
 
     @Override
     public Optional<Carteira> findCarteiraIdByUsuarioId(Long usuarioId) {
-        return jpaRepository.findCarteiraIdByUsuarioId(usuarioId).map(this::toDomain);
+        return jpaRepository.findByContaUsuarioId(usuarioId)
+                .map(this::toDomain);
     }
 
     private Carteira toDomain(CarteiraEntity entity) {

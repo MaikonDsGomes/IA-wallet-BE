@@ -20,6 +20,9 @@ public class AtivoEntity {
     @Column(nullable = false, length = 100)
     private String nome;
 
+    @Column(name = "codigo", nullable = false, length = 20)
+    private String codigo;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoAtivo tipo;
@@ -29,10 +32,4 @@ public class AtivoEntity {
 
     @Column(nullable = false)
     private Boolean ativo;
-
-    @PrePersist
-    protected void onCreate() {
-        if (volatilidade == null) volatilidade = 0;
-        if (ativo == null) ativo = true;
-    }
 }
