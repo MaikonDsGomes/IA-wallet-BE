@@ -1,4 +1,4 @@
-package com.wallet.md.infrastructure.persistence.adapter;
+package com.wallet.md.infrastructure.persistence.adapter.carteira;
 
 import com.wallet.md.domain.model.Carteira;
 import com.wallet.md.domain.repository.carteira.CarteiraRepository;
@@ -18,6 +18,11 @@ public class CarteiraRepositoryAdapter implements CarteiraRepository {
     @Override
     public Optional<Carteira> findByContaId(Long contaId) {
         return jpaRepository.findByContaId(contaId).map(this::toDomain);
+    }
+
+    @Override
+    public Optional<Carteira> findCarteiraIdByUsuarioId(Long usuarioId) {
+        return jpaRepository.findCarteiraIdByUsuarioId(usuarioId).map(this::toDomain);
     }
 
     private Carteira toDomain(CarteiraEntity entity) {
