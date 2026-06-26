@@ -1,7 +1,7 @@
 package com.wallet.md.application.usecase.usuario;
 
 import com.wallet.md.domain.exception.ResourceNotFoundException;
-import com.wallet.md.domain.repository.UsuarioRepository;
+import com.wallet.md.domain.repository.usuario.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor

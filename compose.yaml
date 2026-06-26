@@ -1,22 +1,4 @@
 services:
-  mysql:
-    image: 'mysql:8.0'
-    container_name: investwallet-mysql
-    environment:
-      MYSQL_DATABASE: investwallet
-      MYSQL_ROOT_PASSWORD: verysecret
-      MYSQL_USER: investuser
-      MYSQL_PASSWORD: investpass
-    ports:
-      - '3306:3306'
-    volumes:
-      - mysql_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   redis:
     image: 'redis:7-alpine'
     container_name: investwallet-redis
@@ -31,5 +13,4 @@ services:
       retries: 5
 
 volumes:
-  mysql_data:
   redis_data:

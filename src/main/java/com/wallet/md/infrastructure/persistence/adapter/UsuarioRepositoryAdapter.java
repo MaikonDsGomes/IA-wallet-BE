@@ -1,8 +1,7 @@
 package com.wallet.md.infrastructure.persistence.adapter;
 
 import com.wallet.md.domain.model.Usuario;
-import com.wallet.md.domain.model.enums.Role;
-import com.wallet.md.domain.repository.UsuarioRepository;
+import com.wallet.md.domain.repository.usuario.UsuarioRepository;
 import com.wallet.md.infrastructure.persistence.entity.UsuarioEntity;
 import com.wallet.md.infrastructure.persistence.repository.JpaUsuarioRepository;
 import lombok.RequiredArgsConstructor;

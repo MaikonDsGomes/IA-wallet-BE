@@ -2,13 +2,11 @@ package com.wallet.md.infrastructure.config;
 
 import com.wallet.md.application.mapper.UsuarioMapper;
 import com.wallet.md.application.usecase.*;
+import com.wallet.md.application.usecase.carteira.GetPosicoesCarteiraUseCase;
 import com.wallet.md.application.usecase.carteira.GetScoreCarteiraUseCase;
 import com.wallet.md.application.usecase.usuario.*;
-import com.wallet.md.domain.repository.UsuarioRepository;
-import com.wallet.md.domain.repository.carteira.CarteiraRepository;
-import com.wallet.md.domain.repository.carteira.ContaRepository;
-import com.wallet.md.domain.repository.carteira.PerfilRiscoRepository;
-import com.wallet.md.domain.repository.carteira.ScoreCarteiraRepository;
+import com.wallet.md.domain.repository.carteira.*;
+import com.wallet.md.domain.repository.usuario.UsuarioRepository;
 import com.wallet.md.domain.service.PasswordEncoderService;
 import com.wallet.md.domain.service.TokenProvider;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +19,14 @@ public class UseCaseConfig {
     public RegisterUsuarioUseCase registerUsuarioUseCase(
             UsuarioRepository repo, PasswordEncoderService encoder, UsuarioMapper mapper) {
         return new RegisterUsuarioUseCase(repo, encoder, mapper);
+    }
+
+    @Bean
+    public GetPosicoesCarteiraUseCase getPosicoesCarteiraUseCase(
+            CarteiraRepository carteiraRepository,
+            PosicaoRepository posicaoRepository,
+            CotacaoRepository cotacaoRepository) {
+        return new GetPosicoesCarteiraUseCase(carteiraRepository, posicaoRepository, cotacaoRepository);
     }
 
     @Bean

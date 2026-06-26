@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 public interface PosicaoDetalhadaProjection {
     Long getAtivoId();
     String getAtivoNome();
+    String getAtivoCodigo();
     TipoAtivo getAtivoTipo();
     Integer getQuantidade();
     BigDecimal getPrecoMedio();

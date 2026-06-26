@@ -6,7 +6,7 @@ import com.wallet.md.application.mapper.UsuarioMapper;
 import com.wallet.md.domain.exception.DuplicateResourceException;
 import com.wallet.md.domain.model.Usuario;
 import com.wallet.md.domain.model.enums.Role;
-import com.wallet.md.domain.repository.UsuarioRepository;
+import com.wallet.md.domain.repository.usuario.UsuarioRepository;
 import com.wallet.md.domain.service.PasswordEncoderService;
 import lombok.RequiredArgsConstructor;
 

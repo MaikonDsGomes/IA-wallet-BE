@@ -3,7 +3,7 @@ package com.wallet.md.application.usecase.usuario;
 import com.wallet.md.application.dto.request.RefreshTokenRequest;
 import com.wallet.md.application.dto.response.AuthResponse;
 import com.wallet.md.domain.exception.InvalidCredentialsException;
-import com.wallet.md.domain.repository.UsuarioRepository;
+import com.wallet.md.domain.repository.usuario.UsuarioRepository;
 import com.wallet.md.domain.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
 
