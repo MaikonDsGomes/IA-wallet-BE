@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface JpaPosicaoRepository extends JpaRepository<PosicaoEntity, Long> {
 
@@ -39,4 +40,6 @@ public interface JpaPosicaoRepository extends JpaRepository<PosicaoEntity, Long>
             @Param("carteiraId") Long carteiraId,
             @Param("tipo") TipoAtivo tipo
     );
+
+    Optional<PosicaoEntity> findByCarteiraIdAndAtivoId(Long carteiraId, Long ativoId);
 }

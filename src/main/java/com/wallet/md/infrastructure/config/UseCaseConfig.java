@@ -2,6 +2,7 @@ package com.wallet.md.infrastructure.config;
 
 import com.wallet.md.application.mapper.UsuarioMapper;
 import com.wallet.md.application.usecase.*;
+import com.wallet.md.application.usecase.carteira.PostPosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.GetPosicoesCarteiraUseCase;
 import com.wallet.md.application.usecase.carteira.GetScoreCarteiraUseCase;
 import com.wallet.md.application.usecase.usuario.*;
@@ -19,6 +20,14 @@ public class UseCaseConfig {
     public RegisterUsuarioUseCase registerUsuarioUseCase(
             UsuarioRepository repo, PasswordEncoderService encoder, UsuarioMapper mapper) {
         return new RegisterUsuarioUseCase(repo, encoder, mapper);
+    }
+
+    @Bean
+    public PostPosicaoUseCase adicionarPosicaoUseCase(
+            CarteiraRepository carteiraRepository,
+            AtivoRepository ativoRepository,
+            PosicaoRepository posicaoRepository) {
+        return new PostPosicaoUseCase(carteiraRepository, ativoRepository, posicaoRepository);
     }
 
     @Bean
