@@ -1,7 +1,9 @@
 package com.wallet.md.infrastructure.config;
 
+import com.wallet.md.application.dto.request.carteira.DeletePosicaoRequest;
 import com.wallet.md.application.mapper.UsuarioMapper;
 import com.wallet.md.application.usecase.*;
+import com.wallet.md.application.usecase.carteira.DeletePosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.PostPosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.GetPosicoesCarteiraUseCase;
 import com.wallet.md.application.usecase.carteira.GetScoreCarteiraUseCase;
@@ -37,7 +39,12 @@ public class UseCaseConfig {
             CotacaoRepository cotacaoRepository) {
         return new GetPosicoesCarteiraUseCase(carteiraRepository, posicaoRepository, cotacaoRepository);
     }
-
+    @Bean
+    public DeletePosicaoUseCase deletePosicaoUseCase(
+            CarteiraRepository carteiraRepository,
+            PosicaoRepository posicaoRepository) {
+        return new DeletePosicaoUseCase(carteiraRepository, posicaoRepository);
+    }
     @Bean
     public AuthenticateUsuarioUseCase authenticateUsuarioUseCase(
             UsuarioRepository repo, PasswordEncoderService encoder, TokenProvider tokenProvider) {

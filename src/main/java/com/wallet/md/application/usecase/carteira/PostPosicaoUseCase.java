@@ -1,6 +1,6 @@
 package com.wallet.md.application.usecase.carteira;
 
-import com.wallet.md.application.dto.request.carteira.AdicionarPosicaoRequest;
+import com.wallet.md.application.dto.request.carteira.PostPosicaoRequest;
 import com.wallet.md.domain.exception.NotFoundException;
 import com.wallet.md.domain.repository.carteira.AtivoRepository;
 import com.wallet.md.domain.repository.carteira.CarteiraRepository;
@@ -14,7 +14,7 @@ public class PostPosicaoUseCase {
     private final AtivoRepository ativoRepository;
     private final PosicaoRepository posicaoRepository;
 
-    public void post(Long usuarioId, AdicionarPosicaoRequest request) {
+    public void post(Long usuarioId, PostPosicaoRequest request) {
 
         var carteira = carteiraRepository.findCarteiraIdByUsuarioId(usuarioId)
                 .orElseThrow(() -> new NotFoundException("Carteira não encontrada"));

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
-public record AdicionarPosicaoRequest(
+public record PostPosicaoRequest(
 
         @NotBlank(message = "Código do ativo é obrigatório")
         String codigo,

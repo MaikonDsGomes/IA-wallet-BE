@@ -19,4 +19,7 @@ public interface PosicaoRepository {
 
     Optional<Posicao> findByCarteiraIdAndAtivoId(Long carteiraId, Long ativoId);
 
+    void deleteByCarteiraIdAndAtivoId(Long carteiraId, Long ativoId);
+
+    //void updateQuantidadeAndPrecoMedio(Long carteiraId, Long ativoId, Integer quantidade, BigDecimal precoMedio);
 }

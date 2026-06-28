@@ -42,4 +42,6 @@ public interface JpaPosicaoRepository extends JpaRepository<PosicaoEntity, Long>
     );
 
     Optional<PosicaoEntity> findByCarteiraIdAndAtivoId(Long carteiraId, Long ativoId);
+
+    void deleteByCarteiraIdAndAtivoId(Long carteiraId, Long ativoId);
 }

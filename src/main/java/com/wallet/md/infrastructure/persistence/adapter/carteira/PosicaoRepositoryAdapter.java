@@ -12,6 +12,7 @@ import com.wallet.md.infrastructure.persistence.repository.JpaCarteiraRepository
 import com.wallet.md.infrastructure.persistence.repository.carteira.JpaPosicaoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -40,6 +41,12 @@ public class PosicaoRepositoryAdapter implements PosicaoRepository {
     public Optional<Posicao> findByCarteiraIdAndAtivoId(Long carteiraId, Long ativoId) {
         return jpaRepository.findByCarteiraIdAndAtivoId(carteiraId, ativoId)
                 .map(this::toDomain);
+    }
+
+    @Override
+    @Transactional
+    public void deleteByCarteiraIdAndAtivoId(Long carteiraId, Long ativoId) {
+        jpaRepository.deleteByCarteiraIdAndAtivoId(carteiraId, ativoId);
     }
 
     @Override

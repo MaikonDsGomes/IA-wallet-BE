@@ -1,9 +1,11 @@
 package com.wallet.md.presentation.controller;
 
-import com.wallet.md.application.dto.request.carteira.AdicionarPosicaoRequest;
+import com.wallet.md.application.dto.request.carteira.DeletePosicaoRequest;
+import com.wallet.md.application.dto.request.carteira.PostPosicaoRequest;
 import com.wallet.md.application.dto.response.ApiResponse;
 import com.wallet.md.application.dto.response.carteira.PosicaoResponse;
 import com.wallet.md.application.dto.response.carteira.ScoreCarteiraResponse;
+import com.wallet.md.application.usecase.carteira.DeletePosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.GetPosicoesCarteiraUseCase;
 import com.wallet.md.application.usecase.carteira.GetScoreCarteiraUseCase;
 import com.wallet.md.application.usecase.carteira.PostPosicaoUseCase;
@@ -27,6 +29,7 @@ public class CarteiraController {
     private final GetScoreCarteiraUseCase getScoreCarteiraUseCase;
     private final GetPosicoesCarteiraUseCase getPosicoesCarteiraUseCase;
     private final PostPosicaoUseCase postPosicaoUseCase;
+    private final DeletePosicaoUseCase deletePosicaoUseCase;
 
     @GetMapping("/score")
     public ResponseEntity<ApiResponse<ScoreCarteiraResponse>> getScore(
@@ -40,7 +43,7 @@ public class CarteiraController {
     @PostMapping("/posicoes")
     public ResponseEntity<ApiResponse<Void>> adicionarPosicao(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody @Valid AdicionarPosicaoRequest request) {
+            @RequestBody @Valid PostPosicaoRequest request) {
 
         var usuarioId = AuthUtils.extractUserId(userDetails);
         postPosicaoUseCase.post(usuarioId, request);
@@ -55,6 +58,15 @@ public class CarteiraController {
         var usuarioId = AuthUtils.extractUserId(userDetails);
         var posicoes = getPosicoesCarteiraUseCase.getDadosPosicao(usuarioId, tipo);
         return ResponseEntity.ok(ApiResponse.success(posicoes));
+    }
+
+    @DeleteMapping("/posicoes")
+    public ResponseEntity<ApiResponse<Void>> deletarPosicao(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody @Valid DeletePosicaoRequest request) {
+        Long usuarioId = AuthUtils.extractUserId(userDetails);
+        deletePosicaoUseCase.delete(request, usuarioId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.success(null));
     }
 
 
