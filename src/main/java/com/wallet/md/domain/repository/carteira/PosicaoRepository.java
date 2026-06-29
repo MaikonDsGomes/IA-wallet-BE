@@ -21,5 +21,5 @@ public interface PosicaoRepository {
 
     void deleteByCarteiraIdAndAtivoId(Long carteiraId, Long ativoId);
 
-    //void updateQuantidadeAndPrecoMedio(Long carteiraId, Long ativoId, Integer quantidade, BigDecimal precoMedio);
+    void updateQuantidadeVenda(Long carteiraId, Long ativoId, Integer quantidadeVendida, BigDecimal precoVenda);
 }

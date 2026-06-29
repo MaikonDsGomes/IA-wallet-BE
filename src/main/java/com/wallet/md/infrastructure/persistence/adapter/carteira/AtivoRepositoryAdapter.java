@@ -21,6 +21,11 @@ public class AtivoRepositoryAdapter implements AtivoRepository {
         return jpaRepository.findByCodigo(codigo).map(this::toDomain);
     }
 
+    @Override
+    public Optional<Ativo> findById(Long ativoId) {
+        return jpaRepository.findById(ativoId).map(this::toDomain);
+    }
+
     private Ativo toDomain(AtivoEntity entity) {
         return Ativo.builder()
                 .id(entity.getId())

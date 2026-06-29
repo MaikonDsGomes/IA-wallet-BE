@@ -48,6 +48,27 @@ public class PosicaoRepositoryAdapter implements PosicaoRepository {
     public void deleteByCarteiraIdAndAtivoId(Long carteiraId, Long ativoId) {
         jpaRepository.deleteByCarteiraIdAndAtivoId(carteiraId, ativoId);
     }
+    
+    @Override
+    @Transactional
+    public void updateQuantidadeVenda(Long carteiraId, Long ativoId, Integer quantidadeVendida, BigDecimal precoVenda) {
+        jpaRepository.findByCarteiraIdAndAtivoId(carteiraId, ativoId).ifPresent(existing -> {
+            int quantidadeRestante = existing.getQuantidade() - quantidadeVendida;
+
+            if (quantidadeRestante <= 0) {
+                jpaRepository.delete(existing);
+            } else {
+                BigDecimal novoPrecoMedio = existing.getPrecoMedio()
+                        .multiply(BigDecimal.valueOf(existing.getQuantidade()))
+                        .subtract(precoVenda.multiply(BigDecimal.valueOf(quantidadeVendida)))
+                        .divide(BigDecimal.valueOf(quantidadeRestante), 4, RoundingMode.HALF_UP);
+
+                existing.setQuantidade(quantidadeRestante);
+                existing.setPrecoMedio(novoPrecoMedio);
+                jpaRepository.save(existing);
+            }
+        });
+    }
 
     @Override
     public void save(Long carteiraId, Long ativoId, Integer quantidade, BigDecimal precoMedio) {

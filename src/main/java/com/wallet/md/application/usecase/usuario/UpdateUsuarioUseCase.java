@@ -1,4 +1,4 @@
-package com.wallet.md.application.usecase;
+package com.wallet.md.application.usecase.usuario;
 
 import com.wallet.md.application.dto.request.UpdateUsuarioRequest;
 import com.wallet.md.application.dto.response.UsuarioResponse;

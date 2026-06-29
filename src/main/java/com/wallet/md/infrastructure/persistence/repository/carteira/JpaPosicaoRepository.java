@@ -5,9 +5,11 @@ import com.wallet.md.infrastructure.persistence.entity.PosicaoEntity;
 import com.wallet.md.infrastructure.persistence.projection.PosicaoComClasseProjection;
 import com.wallet.md.infrastructure.persistence.projection.PosicaoDetalhadaProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,4 +46,10 @@ public interface JpaPosicaoRepository extends JpaRepository<PosicaoEntity, Long>
     Optional<PosicaoEntity> findByCarteiraIdAndAtivoId(Long carteiraId, Long ativoId);
 
     void deleteByCarteiraIdAndAtivoId(Long carteiraId, Long ativoId);
+
+    @Modifying
+    @Query("UPDATE PosicaoEntity p SET p.quantidade = :quantidade, p.precoMedio = :precoMedio WHERE p.id = :id")
+    void updateQuantidadeVenda(@Param("id") Long id,
+                                       @Param("quantidade") Integer quantidade,
+                                       @Param("precoMedio") BigDecimal precoMedio);
 }

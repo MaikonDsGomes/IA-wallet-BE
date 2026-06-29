@@ -1,10 +1,7 @@
 package com.wallet.md.presentation.advice;
 
 import com.wallet.md.application.dto.response.ApiResponse;
-import com.wallet.md.domain.exception.BusinessException;
-import com.wallet.md.domain.exception.DuplicateResourceException;
-import com.wallet.md.domain.exception.InvalidCredentialsException;
-import com.wallet.md.domain.exception.ResourceNotFoundException;
+import com.wallet.md.domain.exception.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,6 +51,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponse<>(false, "Erro de validação", errors, java.time.LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(ViolacaoRegraDeNegocio.class)
+    public ResponseEntity<ApiResponse<Void>> handleViolacaoRegraDeNegocio(ViolacaoRegraDeNegocio ex) {
+        return ResponseEntity
+                .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                .body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(AccessDeniedException.class)

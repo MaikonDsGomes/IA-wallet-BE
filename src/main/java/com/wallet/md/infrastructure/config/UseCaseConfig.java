@@ -1,8 +1,6 @@
 package com.wallet.md.infrastructure.config;
 
-import com.wallet.md.application.dto.request.carteira.DeletePosicaoRequest;
 import com.wallet.md.application.mapper.UsuarioMapper;
-import com.wallet.md.application.usecase.*;
 import com.wallet.md.application.usecase.carteira.DeletePosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.PostPosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.GetPosicoesCarteiraUseCase;
