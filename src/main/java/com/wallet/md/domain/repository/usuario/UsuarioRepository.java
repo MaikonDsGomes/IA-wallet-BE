@@ -1,4 +1,4 @@
-package com.wallet.md.domain.repository;
+package com.wallet.md.domain.repository.usuario;
 
 import com.wallet.md.domain.model.Usuario;
 

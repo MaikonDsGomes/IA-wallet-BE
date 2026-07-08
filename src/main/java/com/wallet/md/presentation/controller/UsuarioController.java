@@ -4,10 +4,10 @@ import com.wallet.md.application.dto.request.UpdateUsuarioRequest;
 import com.wallet.md.application.dto.response.ApiResponse;
 import com.wallet.md.application.dto.response.PageResponse;
 import com.wallet.md.application.dto.response.UsuarioResponse;
-import com.wallet.md.application.usecase.*;
 import com.wallet.md.application.usecase.usuario.DeleteUsuarioUseCase;
 import com.wallet.md.application.usecase.usuario.GetUsuarioUseCase;
 import com.wallet.md.application.usecase.usuario.ListUsuariosUseCase;
+import com.wallet.md.application.usecase.usuario.UpdateUsuarioUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import static com.wallet.md.presentation.utils.AuthUtils.extractUserId;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/usuarios")
 @RequiredArgsConstructor
 @Tag(name = "Usuários", description = "CRUD de usuários")
 public class UsuarioController {
@@ -81,12 +81,5 @@ public class UsuarioController {
         return ResponseEntity.ok(ApiResponse.success("Usuário deletado com sucesso", null));
     }
 
-    @GetMapping("/me/perfil-risco")
-    @Operation(summary = "Obter perfil de risco do usuário autenticado")
-    public ResponseEntity<ApiResponse<String>> getPerfilRisco(@AuthenticationPrincipal UserDetails userDetails) {
-        Long id = extractUserId(userDetails);
-        String perfilRisco = getUsuarioUseCase.getPerfilRisco(id);
-        return ResponseEntity.ok(ApiResponse.success("Perfil de risco obtido com sucesso", perfilRisco));
-    }
 
 }
