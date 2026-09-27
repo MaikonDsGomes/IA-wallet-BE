@@ -5,8 +5,11 @@ import com.wallet.md.application.usecase.carteira.DeletePosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.PostPosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.GetPosicoesCarteiraUseCase;
 import com.wallet.md.application.usecase.carteira.GetScoreCarteiraUseCase;
+import com.wallet.md.application.usecase.ativo.GetAtivosPorTicket;
 import com.wallet.md.application.usecase.usuario.*;
 import com.wallet.md.domain.repository.carteira.*;
+import com.wallet.md.domain.repository.ativo.CotacaoAtivoRepository;
+import com.wallet.md.domain.repository.ativo.AtivoRepository;
 import com.wallet.md.domain.repository.usuario.UsuarioRepository;
 import com.wallet.md.domain.service.PasswordEncoderService;
 import com.wallet.md.domain.service.TokenProvider;
@@ -17,6 +20,13 @@ import org.springframework.context.annotation.Configuration;
 public class UseCaseConfig {
 
     @Bean
+    public GetAtivosPorTicket getAtivosPorTicket(
+            AtivoRepository ativoRepository,
+            CotacaoAtivoRepository cotacaoRepository) {
+        return new GetAtivosPorTicket(ativoRepository, cotacaoRepository);
+    }
+
+    @Bean
     public RegisterUsuarioUseCase registerUsuarioUseCase(
             UsuarioRepository repo, PasswordEncoderService encoder, UsuarioMapper mapper) {
         return new RegisterUsuarioUseCase(repo, encoder, mapper);
@@ -25,7 +35,7 @@ public class UseCaseConfig {
     @Bean
     public PostPosicaoUseCase adicionarPosicaoUseCase(
             CarteiraRepository carteiraRepository,
-            AtivoRepository ativoRepository,
+            com.wallet.md.domain.repository.carteira.AtivoRepository ativoRepository,
             PosicaoRepository posicaoRepository) {
         return new PostPosicaoUseCase(carteiraRepository, ativoRepository, posicaoRepository);
     }
