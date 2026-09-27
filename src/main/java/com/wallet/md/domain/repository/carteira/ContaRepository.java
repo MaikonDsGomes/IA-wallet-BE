@@ -5,4 +5,6 @@ import java.util.Optional;
 
 public interface ContaRepository {
     Optional<Conta> findByUsuarioId(Long usuarioId);
+
+    void creditar(Long contaId, java.math.BigDecimal valor);
 }

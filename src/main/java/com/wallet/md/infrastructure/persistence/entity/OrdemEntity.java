@@ -25,6 +25,10 @@ public class OrdemEntity {
     @JoinColumn(name = "conta_id", nullable = false)
     private ContaEntity conta;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ativo_id", nullable = false)
+    private AtivoEntity ativo;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoOrdem tipo;

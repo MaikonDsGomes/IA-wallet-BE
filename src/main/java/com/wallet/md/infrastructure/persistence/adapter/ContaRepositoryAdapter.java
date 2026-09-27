@@ -6,6 +6,7 @@ import com.wallet.md.infrastructure.persistence.entity.ContaEntity;
 import com.wallet.md.infrastructure.persistence.repository.JpaContaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -19,6 +20,14 @@ public class ContaRepositoryAdapter implements ContaRepository {
     @Override
     public Optional<Conta> findByUsuarioId(Long usuarioId) {
         return jpaRepository.findByUsuarioId(usuarioId).map(this::toDomain);
+    }
+
+    @Override
+    @Transactional
+    public void creditar(Long contaId, java.math.BigDecimal valor) {
+        if (jpaRepository.creditar(contaId, valor) != 1) {
+            throw new IllegalStateException("Conta não encontrada para crédito");
+        }
     }
 
     private Conta toDomain(ContaEntity entity) {

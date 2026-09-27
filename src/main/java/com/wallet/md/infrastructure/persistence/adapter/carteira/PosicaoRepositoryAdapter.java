@@ -58,13 +58,7 @@ public class PosicaoRepositoryAdapter implements PosicaoRepository {
             if (quantidadeRestante <= 0) {
                 jpaRepository.delete(existing);
             } else {
-                BigDecimal novoPrecoMedio = existing.getPrecoMedio()
-                        .multiply(BigDecimal.valueOf(existing.getQuantidade()))
-                        .subtract(precoVenda.multiply(BigDecimal.valueOf(quantidadeVendida)))
-                        .divide(BigDecimal.valueOf(quantidadeRestante), 4, RoundingMode.HALF_UP);
-
                 existing.setQuantidade(quantidadeRestante);
-                existing.setPrecoMedio(novoPrecoMedio);
                 jpaRepository.save(existing);
             }
         });

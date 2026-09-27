@@ -37,6 +37,9 @@ class CarteiraControllerTest {
     @MockBean DeletePosicaoUseCase deleteUseCase;
     @MockBean GetRecomendacoesCarteiraUseCase recomendacoesUseCase;
     @MockBean SolicitarAtualizacaoRecomendacoesUseCase solicitarRecomendacoesUseCase;
+    @MockBean VenderPosicaoUseCase venderPosicaoUseCase;
+    @MockBean GetMovimentacoesContaUseCase movimentacoesUseCase;
+    @MockBean GetOrdensContaUseCase ordensUseCase;
     @MockBean JwtAuthenticationFilter jwtAuthenticationFilter;
     @MockBean JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
@@ -100,6 +103,28 @@ class CarteiraControllerTest {
     }
 
     @Test
+    void deveVenderPosicao() throws Exception {
+        given(venderPosicaoUseCase.vender(eq(1L), any())).willReturn(
+                new com.wallet.md.application.dto.response.carteira.VendaPosicaoResponse(
+                        9L, 1L, 2, new BigDecimal("10"), new BigDecimal("20"),
+                        new BigDecimal("120"), LocalDateTime.now()));
+
+        mockMvc.perform(post("/api/v1/carteira/posicoes/venda").with(user())
+                        .contentType("application/json")
+                        .content("{\"ativoId\":1,\"quantidade\":2,\"precoUnitario\":10}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.ordemId").value(9));
+    }
+
+    @Test
+    void deveRejeitarVendaInvalida() throws Exception {
+        mockMvc.perform(post("/api/v1/carteira/posicoes/venda").with(user())
+                        .contentType("application/json")
+                        .content("{\"ativoId\":1,\"quantidade\":0,\"precoUnitario\":0}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void deveListarPosicoes() throws Exception {
         given(posicoesUseCase.getDadosPosicao(1L, null)).willReturn(List.of());
         mockMvc.perform(get("/api/v1/carteira/posicoes").with(user()))
@@ -112,6 +137,14 @@ class CarteiraControllerTest {
                 .willThrow(new ResourceNotFoundException("Carteira", 1));
         mockMvc.perform(get("/api/v1/carteira/posicoes").with(user()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deveListarMovimentacoes() throws Exception {
+        given(movimentacoesUseCase.listar(1L)).willReturn(List.of());
+        mockMvc.perform(get("/api/v1/carteira/movimentacoes").with(user()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 
     @Test

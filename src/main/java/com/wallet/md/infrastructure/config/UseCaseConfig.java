@@ -8,6 +8,9 @@ import com.wallet.md.application.usecase.carteira.GetScoreCarteiraUseCase;
 import com.wallet.md.application.usecase.carteira.GetRecomendacoesCarteiraUseCase;
 import com.wallet.md.application.usecase.carteira.GerarRecomendacoesCarteiraUseCase;
 import com.wallet.md.application.usecase.carteira.SolicitarAtualizacaoRecomendacoesUseCase;
+import com.wallet.md.application.usecase.carteira.VenderPosicaoUseCase;
+import com.wallet.md.application.usecase.carteira.GetMovimentacoesContaUseCase;
+import com.wallet.md.application.usecase.carteira.GetOrdensContaUseCase;
 import com.wallet.md.application.usecase.ativo.GetAtivosPorTicket;
 import com.wallet.md.application.usecase.usuario.*;
 import com.wallet.md.application.service.RecommendationTextProvider;
@@ -119,5 +122,28 @@ public class UseCaseConfig {
     public SolicitarAtualizacaoRecomendacoesUseCase solicitarAtualizacaoRecomendacoesUseCase(
             GerarRecomendacoesCarteiraUseCase gerarRecomendacoesCarteiraUseCase) {
         return new SolicitarAtualizacaoRecomendacoesUseCase(gerarRecomendacoesCarteiraUseCase);
+    }
+
+    @Bean
+    public VenderPosicaoUseCase venderPosicaoUseCase(
+            ContaRepository contaRepository,
+            CarteiraRepository carteiraRepository,
+            PosicaoRepository posicaoRepository,
+            OrdemRepository ordemRepository,
+            MovimentacaoRepository movimentacaoRepository) {
+        return new VenderPosicaoUseCase(contaRepository, carteiraRepository, posicaoRepository,
+                ordemRepository, movimentacaoRepository);
+    }
+
+    @Bean
+    public GetMovimentacoesContaUseCase getMovimentacoesContaUseCase(
+            ContaRepository contaRepository, MovimentacaoRepository movimentacaoRepository) {
+        return new GetMovimentacoesContaUseCase(contaRepository, movimentacaoRepository);
+    }
+
+    @Bean
+    public GetOrdensContaUseCase getOrdensContaUseCase(
+            ContaRepository contaRepository, OrdemRepository ordemRepository) {
+        return new GetOrdensContaUseCase(contaRepository, ordemRepository);
     }
 }

@@ -25,8 +25,8 @@ public class MovimentacaoEntity {
     private ContaEntity conta;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "conta_usuario_id")
-    private ContaEntity contaUsuario;
+    @JoinColumn(name = "conta_destino_id")
+    private ContaEntity contaDestino;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -34,7 +34,7 @@ Localização: `src/main/java/com/wallet/md/presentation`
 |---|---|---|
 | `AuthController` | `/api/v1/auth` | Registro, login, logout e refresh token |
 | `UsuarioController` | `/api/v1/usuarios` | Consulta, listagem paginada, atualização e exclusão de usuários |
-| `CarteiraController` | `/api/v1/carteira` | Score, recomendações, listagem, inclusão e exclusão de posições |
+| `CarteiraController` | `/api/v1/carteira` | Score, recomendações, posições, venda, ordens e movimentações |
 | `AtivoController` | `/api/v1/ativos` | Catálogo, detalhe e histórico de cotações por código/ticker |
 | `PublicController` | `/api/v1/public` | Health check e informações públicas da API |
 
@@ -52,6 +52,9 @@ Localização: `src/main/java/com/wallet/md/presentation`
 
 - `GET /api/v1/carteira/recomendacoes`: consulta as recomendações ativas persistidas para a carteira autenticada.
 - `POST /api/v1/carteira/recomendacoes/atualizacao`: solicita a regeneração assíncrona e retorna `202 Accepted`; o frontend continua usando a última versão disponível durante o processamento.
+- `POST /api/v1/carteira/posicoes/venda`: executa uma venda imediatamente, reduz a posição, registra ordem `VENDA/EXECUTADA`, credita a conta e registra uma movimentação `VENDA` na mesma transação.
+- `GET /api/v1/carteira/movimentacoes`: lista o extrato da conta com o saldo acumulado após cada movimentação.
+- `GET /api/v1/carteira/ordens`: lista as ordens da conta, incluindo ativo, tipo, quantidade, preço e status.
 
 O primeiro motor de recomendações é determinístico e usa o score da carteira, o perfil de risco, a volatilidade, a concentração e a diversificação. Isso evita que o caminho de leitura dependa de um modelo generativo. A tabela `recomendacao` mantém o histórico, enquanto somente os registros ativos são exibidos.
 
@@ -80,7 +83,7 @@ Orquestra os casos de uso sem expor detalhes de HTTP ou de implementação do ba
 ### Casos de uso
 
 - **Usuário/autenticação:** `RegisterUsuarioUseCase`, `AuthenticateUsuarioUseCase`, `RefreshTokenUseCase`, `LogoutUseCase`, `GetUsuarioUseCase`, `ListUsuariosUseCase`, `UpdateUsuarioUseCase` e `DeleteUsuarioUseCase`.
-- **Carteira:** `PostPosicaoUseCase`, `PatchPosicaoUseCase`, `DeletePosicaoUseCase`, `GetPosicoesCarteiraUseCase`, `GetCarteiraKpisUseCase`, `GetScoreCarteiraUseCase`, `GetRecomendacoesCarteiraUseCase`, `GerarRecomendacoesCarteiraUseCase` e `SolicitarAtualizacaoRecomendacoesUseCase`.
+- **Carteira:** `PostPosicaoUseCase`, `PatchPosicaoUseCase`, `DeletePosicaoUseCase`, `VenderPosicaoUseCase`, `GetPosicoesCarteiraUseCase`, `GetMovimentacoesContaUseCase`, `GetOrdensContaUseCase`, `GetCarteiraKpisUseCase`, `GetScoreCarteiraUseCase`, `GetRecomendacoesCarteiraUseCase`, `GerarRecomendacoesCarteiraUseCase` e `SolicitarAtualizacaoRecomendacoesUseCase`.
 - **Ativos:** `GetAtivosPorTicket`.
 
 ### DTOs e conversão
@@ -177,6 +180,14 @@ O `compose.yaml` provisiona somente o Redis. O MySQL precisa estar disponível s
 3. O adaptador chama o repositório JPA e converte o resultado para domínio/projection.
 4. Operações de posição recalculam quantidade e preço médio quando aplicável.
 5. A resposta é convertida para DTO e encapsulada em `ApiResponse`.
+
+### Venda e histórico financeiro
+
+1. `VenderPosicaoUseCase` valida conta, carteira, posição e quantidade disponível.
+2. A posição é reduzida ou removida sem alterar o preço médio remanescente.
+3. A ordem executada é registrada, o saldo é creditado pelo valor bruto e a movimentação é persistida como `VENDA`.
+4. A operação é transacional; falhas interrompem a persistência do conjunto.
+5. O extrato ordenado por data calcula `saldoApos` acumulando depósitos, vendas e saques. Esse histórico permite construir gráficos de saldo sem depender do estado atual da conta.
 
 ## 8. Organização de diretórios
 
