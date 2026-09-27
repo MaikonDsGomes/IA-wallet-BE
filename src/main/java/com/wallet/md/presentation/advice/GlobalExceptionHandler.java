@@ -11,6 +11,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,6 +52,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponse<>(false, "Erro de validação", errors, java.time.LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMissingParameter(MissingServletRequestParameterException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiResponse.error("Parâmetro obrigatório ausente: " + ex.getParameterName()));
     }
 
     @ExceptionHandler(ViolacaoRegraDeNegocio.class)

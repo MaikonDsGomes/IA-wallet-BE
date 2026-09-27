@@ -190,3 +190,18 @@ docker compose up -d redis
 # Executar a aplicação
 ./mvnw spring-boot:run
 ```
+
+## 11. Use cases core e cobertura
+
+Os casos de uso core concentram as regras que sustentam as funções críticas da API:
+
+| Contexto | Use cases core | Funções cobertas |
+|---|---|---|
+| Autenticação | `AuthenticateUsuarioUseCase`, `RefreshTokenUseCase`, `LogoutUseCase` | Login, validação de conta/token, renovação e blacklist |
+| Usuários | `RegisterUsuarioUseCase`, `GetUsuarioUseCase`, `ListUsuariosUseCase`, `UpdateUsuarioUseCase`, `DeleteUsuarioUseCase` | Registro, consulta, paginação, alteração de perfil/senha e exclusão |
+| Carteira | `PostPosicaoUseCase`, `PatchPosicaoUseCase`, `DeletePosicaoUseCase`, `GetScoreCarteiraUseCase`, `GetCarteiraKpisUseCase` | Inclusão/venda/exclusão de posição, score, KPIs e distribuição por classe |
+| Ativos | `GetAtivosPorTicket` | Catálogo, detalhe e histórico de cotações |
+
+São consideradas funções core as operações públicas dos use cases acima. A suíte unitária cobre as 18 funções públicas identificadas (100% de cobertura funcional), sempre com cenários de sucesso e de falha para regras críticas. A cobertura estrutural consolidada pelo JaCoCo nos use cases é de 91,15% de linhas e 60% de branches.
+
+O relatório técnico de linhas/branches é gerado pelo JaCoCo durante `mvnw verify` e fica disponível em `target/site/jacoco/index.html`.
