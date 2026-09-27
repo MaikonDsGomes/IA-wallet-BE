@@ -11,6 +11,7 @@ import com.wallet.md.application.usecase.carteira.SolicitarAtualizacaoRecomendac
 import com.wallet.md.application.usecase.carteira.VenderPosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.GetMovimentacoesContaUseCase;
 import com.wallet.md.application.usecase.carteira.GetOrdensContaUseCase;
+import com.wallet.md.application.usecase.carteira.ComprarPosicaoUseCase;
 import com.wallet.md.application.usecase.ativo.GetAtivosPorTicket;
 import com.wallet.md.application.usecase.usuario.*;
 import com.wallet.md.application.service.RecommendationTextProvider;
@@ -145,5 +146,16 @@ public class UseCaseConfig {
     public GetOrdensContaUseCase getOrdensContaUseCase(
             ContaRepository contaRepository, OrdemRepository ordemRepository) {
         return new GetOrdensContaUseCase(contaRepository, ordemRepository);
+    }
+
+    @Bean
+    public ComprarPosicaoUseCase comprarPosicaoUseCase(
+            ContaRepository contaRepository,
+            CarteiraRepository carteiraRepository,
+            PosicaoRepository posicaoRepository,
+            OrdemRepository ordemRepository,
+            MovimentacaoRepository movimentacaoRepository) {
+        return new ComprarPosicaoUseCase(contaRepository, carteiraRepository, posicaoRepository,
+                ordemRepository, movimentacaoRepository);
     }
 }

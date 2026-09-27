@@ -7,4 +7,6 @@ public interface ContaRepository {
     Optional<Conta> findByUsuarioId(Long usuarioId);
 
     void creditar(Long contaId, java.math.BigDecimal valor);
+
+    boolean debitar(Long contaId, java.math.BigDecimal valor);
 }

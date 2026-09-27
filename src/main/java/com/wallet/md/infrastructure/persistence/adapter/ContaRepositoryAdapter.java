@@ -30,6 +30,12 @@ public class ContaRepositoryAdapter implements ContaRepository {
         }
     }
 
+    @Override
+    @Transactional
+    public boolean debitar(Long contaId, java.math.BigDecimal valor) {
+        return jpaRepository.debitar(contaId, valor) == 1;
+    }
+
     private Conta toDomain(ContaEntity entity) {
         return Conta.builder()
                 .id(entity.getId())

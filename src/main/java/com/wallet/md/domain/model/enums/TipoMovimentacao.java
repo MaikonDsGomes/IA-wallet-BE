@@ -4,5 +4,6 @@ public enum TipoMovimentacao {
     DEPOSITO,
     SAQUE,
     TRANSFERENCIA,
+    COMPRA,
     VENDA
 }

@@ -53,6 +53,7 @@ Localização: `src/main/java/com/wallet/md/presentation`
 - `GET /api/v1/carteira/recomendacoes`: consulta as recomendações ativas persistidas para a carteira autenticada.
 - `POST /api/v1/carteira/recomendacoes/atualizacao`: solicita a regeneração assíncrona e retorna `202 Accepted`; o frontend continua usando a última versão disponível durante o processamento.
 - `POST /api/v1/carteira/posicoes/venda`: executa uma venda imediatamente, reduz a posição, registra ordem `VENDA/EXECUTADA`, credita a conta e registra uma movimentação `VENDA` na mesma transação.
+- `POST /api/v1/carteira/posicoes/compra`: executa uma compra imediatamente, valida e debita o saldo, cria/aumenta a posição, registra ordem `COMPRA/EXECUTADA` e movimentação `COMPRA`.
 - `GET /api/v1/carteira/movimentacoes`: lista o extrato da conta com o saldo acumulado após cada movimentação.
 - `GET /api/v1/carteira/ordens`: lista as ordens da conta, incluindo ativo, tipo, quantidade, preço e status.
 
@@ -187,7 +188,7 @@ O `compose.yaml` provisiona somente o Redis. O MySQL precisa estar disponível s
 2. A posição é reduzida ou removida sem alterar o preço médio remanescente.
 3. A ordem executada é registrada, o saldo é creditado pelo valor bruto e a movimentação é persistida como `VENDA`.
 4. A operação é transacional; falhas interrompem a persistência do conjunto.
-5. O extrato ordenado por data calcula `saldoApos` acumulando depósitos, vendas e saques. Esse histórico permite construir gráficos de saldo sem depender do estado atual da conta.
+5. O extrato ordenado por data calcula `saldoApos` acumulando depósitos e vendas como créditos, e compras e saques como débitos. Esse histórico permite construir gráficos de saldo sem depender do estado atual da conta.
 
 ## 8. Organização de diretórios
 

@@ -23,7 +23,7 @@ public class GetMovimentacoesContaUseCase {
         for (var movimentacao : movimentacaoRepository.findByContaId(conta.getId())) {
             saldo = switch (movimentacao.getTipo()) {
                 case DEPOSITO, VENDA -> saldo.add(movimentacao.getValor());
-                case SAQUE -> saldo.subtract(movimentacao.getValor());
+                case SAQUE, COMPRA -> saldo.subtract(movimentacao.getValor());
                 case TRANSFERENCIA -> saldo;
             };
             respostas.add(new MovimentacaoResponse(

@@ -40,6 +40,7 @@ class CarteiraControllerTest {
     @MockBean VenderPosicaoUseCase venderPosicaoUseCase;
     @MockBean GetMovimentacoesContaUseCase movimentacoesUseCase;
     @MockBean GetOrdensContaUseCase ordensUseCase;
+    @MockBean ComprarPosicaoUseCase comprarPosicaoUseCase;
     @MockBean JwtAuthenticationFilter jwtAuthenticationFilter;
     @MockBean JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
@@ -114,6 +115,28 @@ class CarteiraControllerTest {
                         .content("{\"ativoId\":1,\"quantidade\":2,\"precoUnitario\":10}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.ordemId").value(9));
+    }
+
+    @Test
+    void deveComprarPosicao() throws Exception {
+        given(comprarPosicaoUseCase.comprar(eq(1L), any())).willReturn(
+                new com.wallet.md.application.dto.response.carteira.CompraPosicaoResponse(
+                        10L, 1L, 2, new BigDecimal("10"), new BigDecimal("20"),
+                        new BigDecimal("80"), LocalDateTime.now()));
+
+        mockMvc.perform(post("/api/v1/carteira/posicoes/compra").with(user())
+                        .contentType("application/json")
+                        .content("{\"ativoId\":1,\"quantidade\":2,\"precoUnitario\":10}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.ordemId").value(10));
+    }
+
+    @Test
+    void deveRejeitarCompraInvalida() throws Exception {
+        mockMvc.perform(post("/api/v1/carteira/posicoes/compra").with(user())
+                        .contentType("application/json")
+                        .content("{\"ativoId\":1,\"quantidade\":0,\"precoUnitario\":0}"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.wallet.md.presentation.controller;
 import com.wallet.md.application.dto.request.carteira.DeletePosicaoRequest;
 import com.wallet.md.application.dto.request.carteira.PostPosicaoRequest;
 import com.wallet.md.application.dto.request.carteira.VendaPosicaoRequest;
+import com.wallet.md.application.dto.request.carteira.CompraPosicaoRequest;
 import com.wallet.md.application.dto.response.ApiResponse;
 import com.wallet.md.application.dto.response.carteira.PosicaoResponse;
 import com.wallet.md.application.dto.response.carteira.RecomendacaoResponse;
@@ -10,6 +11,7 @@ import com.wallet.md.application.dto.response.carteira.ScoreCarteiraResponse;
 import com.wallet.md.application.dto.response.carteira.MovimentacaoResponse;
 import com.wallet.md.application.dto.response.carteira.VendaPosicaoResponse;
 import com.wallet.md.application.dto.response.carteira.OrdemResponse;
+import com.wallet.md.application.dto.response.carteira.CompraPosicaoResponse;
 import com.wallet.md.application.usecase.carteira.DeletePosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.GetRecomendacoesCarteiraUseCase;
 import com.wallet.md.application.usecase.carteira.GetPosicoesCarteiraUseCase;
@@ -19,6 +21,7 @@ import com.wallet.md.application.usecase.carteira.SolicitarAtualizacaoRecomendac
 import com.wallet.md.application.usecase.carteira.VenderPosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.GetMovimentacoesContaUseCase;
 import com.wallet.md.application.usecase.carteira.GetOrdensContaUseCase;
+import com.wallet.md.application.usecase.carteira.ComprarPosicaoUseCase;
 import com.wallet.md.domain.model.enums.TipoAtivo;
 import com.wallet.md.presentation.utils.AuthUtils;
 import jakarta.validation.Valid;
@@ -45,6 +48,7 @@ public class CarteiraController {
     private final VenderPosicaoUseCase venderPosicaoUseCase;
     private final GetMovimentacoesContaUseCase getMovimentacoesContaUseCase;
     private final GetOrdensContaUseCase getOrdensContaUseCase;
+    private final ComprarPosicaoUseCase comprarPosicaoUseCase;
 
     @GetMapping("/score")
     public ResponseEntity<ApiResponse<ScoreCarteiraResponse>> getScore(
@@ -87,6 +91,14 @@ public class CarteiraController {
             @RequestBody @Valid VendaPosicaoRequest request) {
         var usuarioId = AuthUtils.extractUserId(userDetails);
         return ResponseEntity.ok(ApiResponse.success(venderPosicaoUseCase.vender(usuarioId, request)));
+    }
+
+    @PostMapping("/posicoes/compra")
+    public ResponseEntity<ApiResponse<CompraPosicaoResponse>> comprarPosicao(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestBody @Valid CompraPosicaoRequest request) {
+        var usuarioId = AuthUtils.extractUserId(userDetails);
+        return ResponseEntity.ok(ApiResponse.success(comprarPosicaoUseCase.comprar(usuarioId, request)));
     }
 
     @GetMapping("/posicoes")
