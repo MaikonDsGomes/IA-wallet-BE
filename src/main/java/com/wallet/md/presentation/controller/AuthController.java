@@ -10,6 +10,7 @@ import com.wallet.md.application.usecase.usuario.AuthenticateUsuarioUseCase;
 import com.wallet.md.application.usecase.usuario.LogoutUseCase;
 import com.wallet.md.application.usecase.usuario.RefreshTokenUseCase;
 import com.wallet.md.application.usecase.usuario.RegisterUsuarioUseCase;
+import com.wallet.md.domain.exception.InvalidCredentialsException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,8 +52,12 @@ public class AuthController {
 
     @PostMapping("/logout")
     @Operation(summary = "Inválida tokens JWT")
-    public ResponseEntity<Void> logout(@Valid @RequestBody HttpServletRequest request) {
-        String token = request.getHeader("Authorization").substring(7);
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        var authorization = request.getHeader("Authorization");
+        if (authorization == null || !authorization.startsWith("Bearer ") || authorization.length() <= 7) {
+            throw new InvalidCredentialsException();
+        }
+        String token = authorization.substring(7);
         logoutUseCase.execute(token);
         return ResponseEntity.noContent().build(); // 204
     }
