@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
@@ -24,6 +25,11 @@ public class CarteiraRepositoryAdapter implements CarteiraRepository {
     public Optional<Carteira> findCarteiraIdByUsuarioId(Long usuarioId) {
         return jpaRepository.findByContaUsuarioId(usuarioId)
                 .map(this::toDomain);
+    }
+
+    @Override
+    public List<Long> findUsuarioIds() {
+        return jpaRepository.findUsuarioIds();
     }
 
     private Carteira toDomain(CarteiraEntity entity) {

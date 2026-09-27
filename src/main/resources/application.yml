@@ -44,6 +44,15 @@ springdoc:
     operations-sorter: method
     tags-sorter: alpha
 
+investwallet:
+  recomendacoes:
+    cron: ${RECOMENDACOES_CRON:0 0 3 ? * SUN}
+  ia:
+    gemini:
+      enabled: ${GEMINI_ENABLED:false}
+      api-key: ${GEMINI_API_KEY:}
+      model: ${GEMINI_MODEL:gemini-2.0-flash}
+
 logging:
   level:
     com.wallet.md: DEBUG

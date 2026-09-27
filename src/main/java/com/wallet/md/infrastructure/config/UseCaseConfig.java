@@ -5,8 +5,12 @@ import com.wallet.md.application.usecase.carteira.DeletePosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.PostPosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.GetPosicoesCarteiraUseCase;
 import com.wallet.md.application.usecase.carteira.GetScoreCarteiraUseCase;
+import com.wallet.md.application.usecase.carteira.GetRecomendacoesCarteiraUseCase;
+import com.wallet.md.application.usecase.carteira.GerarRecomendacoesCarteiraUseCase;
+import com.wallet.md.application.usecase.carteira.SolicitarAtualizacaoRecomendacoesUseCase;
 import com.wallet.md.application.usecase.ativo.GetAtivosPorTicket;
 import com.wallet.md.application.usecase.usuario.*;
+import com.wallet.md.application.service.RecommendationTextProvider;
 import com.wallet.md.domain.repository.carteira.*;
 import com.wallet.md.domain.repository.ativo.CotacaoAtivoRepository;
 import com.wallet.md.domain.repository.ativo.AtivoRepository;
@@ -88,5 +92,32 @@ public class UseCaseConfig {
     @Bean
     public GetScoreCarteiraUseCase getScoreCarteiraUseCase(ContaRepository contaRepository, CarteiraRepository carteiraRepository, ScoreCarteiraRepository scoreCarteiraRepository) {
         return new GetScoreCarteiraUseCase(contaRepository, carteiraRepository, scoreCarteiraRepository);
+    }
+
+    @Bean
+    public GetRecomendacoesCarteiraUseCase getRecomendacoesCarteiraUseCase(
+            ContaRepository contaRepository,
+            CarteiraRepository carteiraRepository,
+            RecomendacaoRepository recomendacaoRepository) {
+        return new GetRecomendacoesCarteiraUseCase(contaRepository, carteiraRepository, recomendacaoRepository);
+    }
+
+    @Bean
+    public GerarRecomendacoesCarteiraUseCase gerarRecomendacoesCarteiraUseCase(
+            ContaRepository contaRepository,
+            CarteiraRepository carteiraRepository,
+            PerfilRiscoRepository perfilRiscoRepository,
+            ScoreCarteiraRepository scoreCarteiraRepository,
+            RecomendacaoRepository recomendacaoRepository,
+            RecommendationTextProvider recommendationTextProvider) {
+        return new GerarRecomendacoesCarteiraUseCase(
+                contaRepository, carteiraRepository, perfilRiscoRepository,
+                scoreCarteiraRepository, recomendacaoRepository, recommendationTextProvider);
+    }
+
+    @Bean
+    public SolicitarAtualizacaoRecomendacoesUseCase solicitarAtualizacaoRecomendacoesUseCase(
+            GerarRecomendacoesCarteiraUseCase gerarRecomendacoesCarteiraUseCase) {
+        return new SolicitarAtualizacaoRecomendacoesUseCase(gerarRecomendacoesCarteiraUseCase);
     }
 }

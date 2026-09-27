@@ -34,7 +34,7 @@ Localização: `src/main/java/com/wallet/md/presentation`
 |---|---|---|
 | `AuthController` | `/api/v1/auth` | Registro, login, logout e refresh token |
 | `UsuarioController` | `/api/v1/usuarios` | Consulta, listagem paginada, atualização e exclusão de usuários |
-| `CarteiraController` | `/api/v1/carteira` | Score, listagem, inclusão e exclusão de posições |
+| `CarteiraController` | `/api/v1/carteira` | Score, recomendações, listagem, inclusão e exclusão de posições |
 | `AtivoController` | `/api/v1/ativos` | Catálogo, detalhe e histórico de cotações por código/ticker |
 | `PublicController` | `/api/v1/public` | Health check e informações públicas da API |
 
@@ -48,6 +48,29 @@ Localização: `src/main/java/com/wallet/md/presentation`
 - `GET /api/v1/ativos/{simbolo}`: retorna os dados do ativo e sua cotação mais recente.
 - `GET /api/v1/ativos/{simbolo}/cotacoes`: retorna o histórico de cotações ordenado da mais recente para a mais antiga.
 
+### Recomendações
+
+- `GET /api/v1/carteira/recomendacoes`: consulta as recomendações ativas persistidas para a carteira autenticada.
+- `POST /api/v1/carteira/recomendacoes/atualizacao`: solicita a regeneração assíncrona e retorna `202 Accepted`; o frontend continua usando a última versão disponível durante o processamento.
+
+O primeiro motor de recomendações é determinístico e usa o score da carteira, o perfil de risco, a volatilidade, a concentração e a diversificação. Isso evita que o caminho de leitura dependa de um modelo generativo. A tabela `recomendacao` mantém o histórico, enquanto somente os registros ativos são exibidos.
+
+`RecomendacoesScheduler` dispara a atualização semanal para todas as carteiras. O desenho permite adicionar eventos de alteração de posição/perfil e um adaptador de IA posteriormente, sem alterar o contrato de consulta. Recomendações são educacionais e não executam ordens nem representam indicação direta de compra ou venda.
+
+#### Personalização opcional com Gemini
+
+O `GerarRecomendacoesCarteiraUseCase` primeiro cria recomendações determinísticas e depois delega somente a melhoria textual para `RecommendationTextProvider`. O adapter atual é `GeminiRecommendationTextProvider`; outro provedor pode ser adicionado implementando essa interface, sem alterar controller, persistência ou regras de negócio.
+
+O Gemini é configurado por variáveis de ambiente:
+
+```powershell
+$env:GEMINI_ENABLED="true"
+$env:GEMINI_API_KEY="sua-chave"
+$env:GEMINI_MODEL="gemini-2.0-flash"
+```
+
+O padrão é desabilitado (`GEMINI_ENABLED=false`), mantendo os textos determinísticos. A chamada usa `responseMimeType=application/json` e um schema com `titulo`, `descricao`, `categoria` e `prioridade`. A resposta é validada, rejeita indicação direta de compra/venda e, em caso de timeout, erro ou JSON inválido, o sistema persiste o texto determinístico original.
+
 ## 3. Camada de aplicação
 
 Localização: `src/main/java/com/wallet/md/application`
@@ -57,7 +80,7 @@ Orquestra os casos de uso sem expor detalhes de HTTP ou de implementação do ba
 ### Casos de uso
 
 - **Usuário/autenticação:** `RegisterUsuarioUseCase`, `AuthenticateUsuarioUseCase`, `RefreshTokenUseCase`, `LogoutUseCase`, `GetUsuarioUseCase`, `ListUsuariosUseCase`, `UpdateUsuarioUseCase` e `DeleteUsuarioUseCase`.
-- **Carteira:** `PostPosicaoUseCase`, `PatchPosicaoUseCase`, `DeletePosicaoUseCase`, `GetPosicoesCarteiraUseCase`, `GetCarteiraKpisUseCase` e `GetScoreCarteiraUseCase`.
+- **Carteira:** `PostPosicaoUseCase`, `PatchPosicaoUseCase`, `DeletePosicaoUseCase`, `GetPosicoesCarteiraUseCase`, `GetCarteiraKpisUseCase`, `GetScoreCarteiraUseCase`, `GetRecomendacoesCarteiraUseCase`, `GerarRecomendacoesCarteiraUseCase` e `SolicitarAtualizacaoRecomendacoesUseCase`.
 - **Ativos:** `GetAtivosPorTicket`.
 
 ### DTOs e conversão
@@ -172,8 +195,7 @@ src/
 
 ## 9. Estado observado e pontos de atenção
 
-- O projeto possui um teste de contexto em `MdApplicationTests`.
-- A execução de `mvnw test` no estado atual não conclui a compilação por inconsistências em `AtivoController`: o controller chama `getAtivosPorTicket(String)`, método que não está disponível na implementação atual de `GetAtivosPorTicket`, e referencia `ativoRepository` sem um campo injetado.
+- O projeto possui um teste de contexto em `MdApplicationTests`; `mvnw verify` valida a suíte e gera o relatório JaCoCo.
 - A configuração versionada contém credenciais e segredo JWT diretamente em `application.yml`; para ambientes compartilhados/produção, esses valores devem ser externalizados por variáveis de ambiente ou secret manager.
 - Há casos de uso e DTOs de análise de IA, recomendações e KPIs presentes na estrutura, mas nem todos possuem controller/integração externa correspondente no recorte atual.
 - Existem repositórios de `ativo` em mais de um subpacote (`domain/repository/ativo` e `domain/repository/carteira`, com adapters/JPA correspondentes). Essa separação deve ser preservada apenas se representar contextos distintos; caso contrário, é candidata a padronização futura.
@@ -199,7 +221,7 @@ Os casos de uso core concentram as regras que sustentam as funções críticas d
 |---|---|---|
 | Autenticação | `AuthenticateUsuarioUseCase`, `RefreshTokenUseCase`, `LogoutUseCase` | Login, validação de conta/token, renovação e blacklist |
 | Usuários | `RegisterUsuarioUseCase`, `GetUsuarioUseCase`, `ListUsuariosUseCase`, `UpdateUsuarioUseCase`, `DeleteUsuarioUseCase` | Registro, consulta, paginação, alteração de perfil/senha e exclusão |
-| Carteira | `PostPosicaoUseCase`, `PatchPosicaoUseCase`, `DeletePosicaoUseCase`, `GetScoreCarteiraUseCase`, `GetCarteiraKpisUseCase` | Inclusão/venda/exclusão de posição, score, KPIs e distribuição por classe |
+| Carteira | `PostPosicaoUseCase`, `PatchPosicaoUseCase`, `DeletePosicaoUseCase`, `GetScoreCarteiraUseCase`, `GetCarteiraKpisUseCase`, `GerarRecomendacoesCarteiraUseCase` | Inclusão/venda/exclusão de posição, score, KPIs, distribuição por classe e recomendações |
 | Ativos | `GetAtivosPorTicket` | Catálogo, detalhe e histórico de cotações |
 
 São consideradas funções core as operações públicas dos use cases acima. A suíte unitária cobre as 18 funções públicas identificadas (100% de cobertura funcional), sempre com cenários de sucesso e de falha para regras críticas. A cobertura estrutural consolidada pelo JaCoCo nos use cases é de 91,15% de linhas e 60% de branches.

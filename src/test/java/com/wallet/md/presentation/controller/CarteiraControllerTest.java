@@ -35,6 +35,8 @@ class CarteiraControllerTest {
     @MockBean GetPosicoesCarteiraUseCase posicoesUseCase;
     @MockBean PostPosicaoUseCase postUseCase;
     @MockBean DeletePosicaoUseCase deleteUseCase;
+    @MockBean GetRecomendacoesCarteiraUseCase recomendacoesUseCase;
+    @MockBean SolicitarAtualizacaoRecomendacoesUseCase solicitarRecomendacoesUseCase;
     @MockBean JwtAuthenticationFilter jwtAuthenticationFilter;
     @MockBean JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
@@ -62,6 +64,21 @@ class CarteiraControllerTest {
         given(scoreUseCase.getScore(1L)).willThrow(new ResourceNotFoundException("Score", 1));
         mockMvc.perform(get("/api/v1/carteira/score").with(user()))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deveConsultarRecomendacoes() throws Exception {
+        given(recomendacoesUseCase.getRecomendacoes(1L)).willReturn(List.of());
+        mockMvc.perform(get("/api/v1/carteira/recomendacoes").with(user()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
+    void deveAgendarAtualizacaoDeRecomendacoes() throws Exception {
+        mockMvc.perform(post("/api/v1/carteira/recomendacoes/atualizacao").with(user()))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.message").value("Atualização de recomendações agendada"));
     }
 
     @Test
