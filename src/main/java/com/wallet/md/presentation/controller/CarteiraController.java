@@ -22,6 +22,8 @@ import com.wallet.md.application.usecase.carteira.VenderPosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.GetMovimentacoesContaUseCase;
 import com.wallet.md.application.usecase.carteira.GetOrdensContaUseCase;
 import com.wallet.md.application.usecase.carteira.ComprarPosicaoUseCase;
+import com.wallet.md.application.usecase.carteira.GetCarteiraKpisUseCase;
+import com.wallet.md.application.usecase.carteira.GetEvolucaoCarteiraUseCase;
 import com.wallet.md.domain.model.enums.TipoAtivo;
 import com.wallet.md.presentation.utils.AuthUtils;
 import jakarta.validation.Valid;
@@ -49,6 +51,16 @@ public class CarteiraController {
     private final GetMovimentacoesContaUseCase getMovimentacoesContaUseCase;
     private final GetOrdensContaUseCase getOrdensContaUseCase;
     private final ComprarPosicaoUseCase comprarPosicaoUseCase;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private GetCarteiraKpisUseCase getCarteiraKpisUseCase;
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private GetEvolucaoCarteiraUseCase getEvolucaoCarteiraUseCase;
+
+    @GetMapping("/kpis")
+    public ResponseEntity<ApiResponse<com.wallet.md.application.dto.response.carteira.CarteiraKpisResponse>> getKpis(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.success(getCarteiraKpisUseCase.execute(AuthUtils.extractUserId(userDetails))));
+    }
 
     @GetMapping("/score")
     public ResponseEntity<ApiResponse<ScoreCarteiraResponse>> getScore(
@@ -61,9 +73,13 @@ public class CarteiraController {
 
     @GetMapping("/recomendacoes")
     public ResponseEntity<ApiResponse<List<RecomendacaoResponse>>> getRecomendacoes(
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(required = false) com.wallet.md.domain.model.enums.CategoriaRecomendacao categoria,
+            @RequestParam(required = false) com.wallet.md.domain.model.enums.Prioridade prioridade,
+            @RequestParam(defaultValue = "0") int pagina,
+            @RequestParam(defaultValue = "20") int tamanho) {
         var usuarioId = AuthUtils.extractUserId(userDetails);
-        return ResponseEntity.ok(ApiResponse.success(getRecomendacoesCarteiraUseCase.getRecomendacoes(usuarioId)));
+        return ResponseEntity.ok(ApiResponse.success(getRecomendacoesCarteiraUseCase.getRecomendacoes(usuarioId, categoria, prioridade, pagina, tamanho)));
     }
 
     @PostMapping("/recomendacoes/atualizacao")
@@ -116,6 +132,12 @@ public class CarteiraController {
             @AuthenticationPrincipal UserDetails userDetails) {
         var usuarioId = AuthUtils.extractUserId(userDetails);
         return ResponseEntity.ok(ApiResponse.success(getMovimentacoesContaUseCase.listar(usuarioId)));
+    }
+
+    @GetMapping({"/evolucao", "/performance", "/saldo-historico"})
+    public ResponseEntity<ApiResponse<List<com.wallet.md.application.dto.response.carteira.EvolucaoCarteiraResponse>>> evolucao(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(ApiResponse.success(getEvolucaoCarteiraUseCase.listar(AuthUtils.extractUserId(userDetails))));
     }
 
     @GetMapping("/ordens")
