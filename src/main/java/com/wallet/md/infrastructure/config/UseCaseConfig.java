@@ -70,6 +70,12 @@ public class UseCaseConfig {
     }
 
     @Bean
+    public AuthenticateGoogleUsuarioUseCase authenticateGoogleUsuarioUseCase(
+            UsuarioRepository repo, PasswordEncoderService encoder, TokenProvider tokenProvider) {
+        return new AuthenticateGoogleUsuarioUseCase(repo, encoder, tokenProvider);
+    }
+
+    @Bean
     public RefreshTokenUseCase refreshTokenUseCase(
             TokenProvider tokenProvider, UsuarioRepository repo) {
         return new RefreshTokenUseCase(tokenProvider, repo);

@@ -1,12 +1,14 @@
 package com.wallet.md.presentation.controller;
 
 import com.wallet.md.application.dto.request.LoginRequest;
+import com.wallet.md.application.dto.request.GoogleAuthRequest;
 import com.wallet.md.application.dto.request.RefreshTokenRequest;
 import com.wallet.md.application.dto.request.RegisterRequest;
 import com.wallet.md.application.dto.response.ApiResponse;
 import com.wallet.md.application.dto.response.AuthResponse;
 import com.wallet.md.application.dto.response.UsuarioResponse;
 import com.wallet.md.application.usecase.usuario.AuthenticateUsuarioUseCase;
+import com.wallet.md.application.usecase.usuario.AuthenticateGoogleUsuarioUseCase;
 import com.wallet.md.application.usecase.usuario.LogoutUseCase;
 import com.wallet.md.application.usecase.usuario.RefreshTokenUseCase;
 import com.wallet.md.application.usecase.usuario.RegisterUsuarioUseCase;
@@ -31,6 +33,7 @@ public class AuthController {
 
     private final RegisterUsuarioUseCase registerUseCase;
     private final AuthenticateUsuarioUseCase authenticateUseCase;
+    private final AuthenticateGoogleUsuarioUseCase authenticateGoogleUseCase;
     private final RefreshTokenUseCase refreshTokenUseCase;
     private final LogoutUseCase logoutUseCase;
 
@@ -48,6 +51,13 @@ public class AuthController {
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
         var auth = authenticateUseCase.execute(request);
         return ResponseEntity.ok(ApiResponse.success("Login realizado com sucesso", auth));
+    }
+
+    @PostMapping("/google")
+    @Operation(summary = "Autenticar com Google")
+    public ResponseEntity<ApiResponse<AuthResponse>> google(@Valid @RequestBody GoogleAuthRequest request) {
+        var auth = authenticateGoogleUseCase.execute(request);
+        return ResponseEntity.ok(ApiResponse.success("Login com Google realizado com sucesso", auth));
     }
 
     @PostMapping("/logout")

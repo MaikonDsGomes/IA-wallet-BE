@@ -33,6 +33,7 @@ class AuthControllerTest {
     @Autowired ObjectMapper objectMapper;
     @MockBean RegisterUsuarioUseCase registerUseCase;
     @MockBean AuthenticateUsuarioUseCase authenticateUseCase;
+    @MockBean AuthenticateGoogleUsuarioUseCase authenticateGoogleUseCase;
     @MockBean RefreshTokenUseCase refreshTokenUseCase;
     @MockBean LogoutUseCase logoutUseCase;
     @MockBean JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -44,7 +45,7 @@ class AuthControllerTest {
                 .willReturn(new UsuarioResponse("Ana", "ana@teste.com", Role.USER, true, LocalDateTime.now()));
         mockMvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"nome":"Ana Teste","email":"ana@teste.com","senha":"123456"}
+                                {"nome":"Ana Teste","email":"ana@teste.com","senha":"12345678"}
                                 """))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.success").value(true));
@@ -66,6 +67,16 @@ class AuthControllerTest {
                         .content("{\"email\":\"ana@teste.com\",\"senha\":\"123456\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.accessToken").value("access"));
+    }
+
+    @Test
+    void deveAutenticarComGoogle() throws Exception {
+        given(authenticateGoogleUseCase.execute(org.mockito.ArgumentMatchers.any()))
+                .willReturn(new AuthResponse("google-access", "google-refresh", 900000L));
+        mockMvc.perform(post("/api/v1/auth/google").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"credential\":\"google-credential\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.accessToken").value("google-access"));
     }
 
     @Test
