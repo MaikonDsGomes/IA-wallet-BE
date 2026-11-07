@@ -12,15 +12,12 @@ import com.wallet.md.domain.repository.carteira.ContaRepository;
 import com.wallet.md.domain.repository.carteira.PerfilRiscoRepository;
 import com.wallet.md.domain.repository.carteira.RecomendacaoRepository;
 import com.wallet.md.domain.repository.carteira.ScoreCarteiraRepository;
-import com.wallet.md.application.service.RecommendationTextProvider;
-import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
-@Slf4j
 public class GerarRecomendacoesCarteiraUseCase {
 
     private final ContaRepository contaRepository;
@@ -28,7 +25,6 @@ public class GerarRecomendacoesCarteiraUseCase {
     private final PerfilRiscoRepository perfilRiscoRepository;
     private final ScoreCarteiraRepository scoreCarteiraRepository;
     private final RecomendacaoRepository recomendacaoRepository;
-    private final RecommendationTextProvider recommendationTextProvider;
 
     public void gerar(Long usuarioId) {
         var conta = contaRepository.findByUsuarioId(usuarioId)
@@ -39,19 +35,8 @@ public class GerarRecomendacoesCarteiraUseCase {
                 .orElseThrow(() -> new ResourceNotFoundException("Score", carteira.getId()));
         var perfil = perfilRiscoRepository.findByUsuarioId(usuarioId).orElse(null);
 
-        var recomendacoes = criarRecomendacoes(carteira.getId(), score, perfil).stream()
-                .map(recomendacao -> melhorarTexto(recomendacao, score, perfil))
-                .toList();
+        var recomendacoes = criarRecomendacoes(carteira.getId(), score, perfil);
         recomendacaoRepository.substituirAtivas(carteira.getId(), recomendacoes);
-    }
-
-    private Recomendacao melhorarTexto(Recomendacao recomendacao, ScoreCarteira score, PerfilRisco perfil) {
-        try {
-            return recommendationTextProvider.improve(recomendacao, score, perfil);
-        } catch (RuntimeException exception) {
-            log.warn("Usando texto determinístico após falha do provedor de IA: {}", exception.getMessage());
-            return recomendacao;
-        }
     }
 
     private List<Recomendacao> criarRecomendacoes(Long carteiraId, ScoreCarteira score, PerfilRisco perfil) {

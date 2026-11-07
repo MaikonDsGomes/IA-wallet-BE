@@ -3,6 +3,7 @@ package com.wallet.md.infrastructure.persistence.adapter;
 import com.wallet.md.domain.model.Conta;
 import com.wallet.md.domain.repository.carteira.ContaRepository;
 import com.wallet.md.infrastructure.persistence.entity.ContaEntity;
+import com.wallet.md.infrastructure.persistence.repository.JpaUsuarioRepository;
 import com.wallet.md.infrastructure.persistence.repository.JpaContaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -16,10 +17,23 @@ import java.util.Optional;
 public class ContaRepositoryAdapter implements ContaRepository {
 
     private final JpaContaRepository jpaRepository;
+    private final JpaUsuarioRepository jpaUsuarioRepository;
 
     @Override
     public Optional<Conta> findByUsuarioId(Long usuarioId) {
         return jpaRepository.findByUsuarioId(usuarioId).map(this::toDomain);
+    }
+
+    @Override
+    @Transactional
+    public Conta createIfAbsent(Long usuarioId) {
+        return jpaRepository.findByUsuarioId(usuarioId)
+                .map(this::toDomain)
+                .orElseGet(() -> toDomain(jpaRepository.save(ContaEntity.builder()
+                        .usuario(jpaUsuarioRepository.getReferenceById(usuarioId))
+                        .saldo(java.math.BigDecimal.ZERO)
+                        .margemDisponivel(0)
+                        .build())));
     }
 
     @Override

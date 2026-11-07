@@ -3,7 +3,6 @@ package com.wallet.md.application.usecase.carteira;
 import com.wallet.md.application.dto.request.carteira.CompraPosicaoRequest;
 import com.wallet.md.application.dto.response.carteira.CompraPosicaoResponse;
 import com.wallet.md.domain.exception.NotFoundException;
-import com.wallet.md.domain.exception.ViolacaoRegraDeNegocio;
 import com.wallet.md.domain.model.Movimentacao;
 import com.wallet.md.domain.model.enums.StatusOrdem;
 import com.wallet.md.domain.model.enums.TipoMovimentacao;
@@ -31,10 +30,6 @@ public class ComprarPosicaoUseCase {
         var carteira = carteiraRepository.findByContaId(conta.getId())
                 .orElseThrow(() -> new NotFoundException("Carteira não encontrada"));
         var valorBruto = request.precoUnitario().multiply(BigDecimal.valueOf(request.quantidade()));
-
-        if (!contaRepository.debitar(conta.getId(), valorBruto)) {
-            throw new ViolacaoRegraDeNegocio("Saldo insuficiente para realizar a compra");
-        }
 
         var executadaEm = LocalDateTime.now();
         posicaoRepository.save(carteira.getId(), request.ativoId(), request.quantidade(), request.precoUnitario());

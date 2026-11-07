@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface PerfilRiscoRepository {
     Optional<PerfilRisco> findByUsuarioId(Long usuarioId);
+
+    PerfilRisco createIfAbsent(Long usuarioId);
 }

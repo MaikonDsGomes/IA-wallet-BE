@@ -18,7 +18,8 @@ public class WebConfig {
                 "http://localhost:3000",
                 "http://localhost:4200",
                 "http://localhost:5173",
-                "http://127.0.0.1:4200"
+                "http://127.0.0.1:4200",
+                "http://192.168.18.13:4200"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));

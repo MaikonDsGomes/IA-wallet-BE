@@ -18,6 +18,8 @@ public interface JpaPosicaoRepository extends JpaRepository<PosicaoEntity, Long>
     @Query("""
         SELECT
             p.ativo.id     AS ativoId,
+            p.quantidade   AS quantidade,
+            p.precoMedio   AS precoMedio,
             p.ativo.tipo   AS ativoClasse
         FROM PosicaoEntity p
         JOIN p.ativo a

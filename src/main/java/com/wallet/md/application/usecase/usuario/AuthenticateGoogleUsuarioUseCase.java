@@ -24,6 +24,7 @@ public class AuthenticateGoogleUsuarioUseCase {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoderService passwordEncoder;
     private final TokenProvider tokenProvider;
+    private final ProvisionarCarteiraUsuarioUseCase provisionarCarteiraUsuarioUseCase;
 
     @Value("${google.client-id}")
     private String googleClientId;
@@ -40,7 +41,9 @@ public class AuthenticateGoogleUsuarioUseCase {
                     .role(Role.USER)
                     .status(true)
                     .build();
-            return usuarioRepository.save(novoUsuario);
+            var usuarioSalvo = usuarioRepository.save(novoUsuario);
+            provisionarCarteiraUsuarioUseCase.execute(usuarioSalvo.getId());
+            return usuarioSalvo;
         });
 
         if (!Boolean.TRUE.equals(usuario.getStatus())) {

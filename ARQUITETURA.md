@@ -57,23 +57,11 @@ Localização: `src/main/java/com/wallet/md/presentation`
 - `GET /api/v1/carteira/movimentacoes`: lista o extrato da conta com o saldo acumulado após cada movimentação.
 - `GET /api/v1/carteira/ordens`: lista as ordens da conta, incluindo ativo, tipo, quantidade, preço e status.
 
-O primeiro motor de recomendações é determinístico e usa o score da carteira, o perfil de risco, a volatilidade, a concentração e a diversificação. Isso evita que o caminho de leitura dependa de um modelo generativo. A tabela `recomendacao` mantém o histórico, enquanto somente os registros ativos são exibidos.
+O motor de recomendações é determinístico e usa o score da carteira, o perfil de risco, a volatilidade, a concentração e a diversificação. A geração não depende de modelo generativo ou chamada externa. A tabela `recomendacao` mantém o histórico, enquanto somente os registros ativos são exibidos.
 
-`RecomendacoesScheduler` dispara a atualização semanal para todas as carteiras. O desenho permite adicionar eventos de alteração de posição/perfil e um adaptador de IA posteriormente, sem alterar o contrato de consulta. Recomendações são educacionais e não executam ordens nem representam indicação direta de compra ou venda.
+`RecomendacoesScheduler` dispara a atualização semanal para todas as carteiras. O desenho permite adicionar eventos de alteração de posição/perfil posteriormente, sem alterar o contrato de consulta. Recomendações são educacionais e não executam ordens nem representam indicação direta de compra ou venda.
 
-#### Personalização opcional com Gemini
-
-O `GerarRecomendacoesCarteiraUseCase` primeiro cria recomendações determinísticas e depois delega somente a melhoria textual para `RecommendationTextProvider`. O adapter atual é `GeminiRecommendationTextProvider`; outro provedor pode ser adicionado implementando essa interface, sem alterar controller, persistência ou regras de negócio.
-
-O Gemini é configurado por variáveis de ambiente:
-
-```powershell
-$env:GEMINI_ENABLED="true"
-$env:GEMINI_API_KEY="sua-chave"
-$env:GEMINI_MODEL="gemini-2.0-flash"
-```
-
-O padrão é desabilitado (`GEMINI_ENABLED=false`), mantendo os textos determinísticos. A chamada usa `responseMimeType=application/json` e um schema com `titulo`, `descricao`, `categoria` e `prioridade`. A resposta é validada, rejeita indicação direta de compra/venda e, em caso de timeout, erro ou JSON inválido, o sistema persiste o texto determinístico original.
+O endpoint de recomendações retorna também metadados de apresentação (`tipo`, `cor`, `icone` e `acaoSugerida`), permitindo que o frontend monte cards sem interpretar textos ou depender de IA.
 
 ## 3. Camada de aplicação
 

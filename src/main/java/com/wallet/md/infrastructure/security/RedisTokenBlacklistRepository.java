@@ -16,12 +16,12 @@ public class RedisTokenBlacklistRepository implements TokenBlacklistRepository {
 
     @Override
     public void blacklist(String token, long ttlMs) {
-        redisTemplate.opsForValue().set(
-                PREFIX + token,
-                "revoked",
-                ttlMs,
-                TimeUnit.MILLISECONDS
-        );
+        if (ttlMs == Long.MAX_VALUE) {
+            redisTemplate.opsForValue().set(PREFIX + token, "revoked");
+            return;
+        }
+
+        redisTemplate.opsForValue().set(PREFIX + token, "revoked", ttlMs, TimeUnit.MILLISECONDS);
     }
 
     @Override

@@ -16,11 +16,16 @@ public record RecomendacaoResponse(
         LocalDateTime geradaEm,
         String ativoCodigo,
         String ativoNome,
-        String ativoTipo
+        String ativoTipo,
+        String tipo,
+        String cor,
+        String icone,
+        String acaoSugerida
 ) {
     public RecomendacaoResponse(Long id, Long ativoId, String titulo, String descricao,
                                 CategoriaRecomendacao categoria, Prioridade prioridade,
                                 Integer impactoPts, LocalDateTime geradaEm) {
-        this(id, ativoId, titulo, descricao, categoria, prioridade, impactoPts, geradaEm, null, null, null);
+        this(id, ativoId, titulo, descricao, categoria, prioridade, impactoPts, geradaEm,
+                null, null, null, null, null, null, null);
     }
 }

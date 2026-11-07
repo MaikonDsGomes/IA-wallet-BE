@@ -16,7 +16,6 @@ import com.wallet.md.application.usecase.carteira.GetCarteiraKpisUseCase;
 import com.wallet.md.application.usecase.carteira.GetEvolucaoCarteiraUseCase;
 import com.wallet.md.application.usecase.ativo.GetAtivosPorTicket;
 import com.wallet.md.application.usecase.usuario.*;
-import com.wallet.md.application.service.RecommendationTextProvider;
 import com.wallet.md.domain.repository.carteira.*;
 import com.wallet.md.domain.repository.ativo.CotacaoAtivoRepository;
 import com.wallet.md.domain.repository.ativo.AtivoRepository;
@@ -38,8 +37,17 @@ public class UseCaseConfig {
 
     @Bean
     public RegisterUsuarioUseCase registerUsuarioUseCase(
-            UsuarioRepository repo, PasswordEncoderService encoder, UsuarioMapper mapper) {
-        return new RegisterUsuarioUseCase(repo, encoder, mapper);
+            UsuarioRepository repo, PasswordEncoderService encoder, UsuarioMapper mapper,
+            ProvisionarCarteiraUsuarioUseCase provisionarCarteiraUsuarioUseCase) {
+        return new RegisterUsuarioUseCase(repo, encoder, mapper, provisionarCarteiraUsuarioUseCase);
+    }
+
+    @Bean
+    public ProvisionarCarteiraUsuarioUseCase provisionarCarteiraUsuarioUseCase(
+            ContaRepository contaRepository,
+            CarteiraRepository carteiraRepository,
+            PerfilRiscoRepository perfilRiscoRepository) {
+        return new ProvisionarCarteiraUsuarioUseCase(contaRepository, carteiraRepository, perfilRiscoRepository);
     }
 
     @Bean
@@ -71,8 +79,9 @@ public class UseCaseConfig {
 
     @Bean
     public AuthenticateGoogleUsuarioUseCase authenticateGoogleUsuarioUseCase(
-            UsuarioRepository repo, PasswordEncoderService encoder, TokenProvider tokenProvider) {
-        return new AuthenticateGoogleUsuarioUseCase(repo, encoder, tokenProvider);
+            UsuarioRepository repo, PasswordEncoderService encoder, TokenProvider tokenProvider,
+            ProvisionarCarteiraUsuarioUseCase provisionarCarteiraUsuarioUseCase) {
+        return new AuthenticateGoogleUsuarioUseCase(repo, encoder, tokenProvider, provisionarCarteiraUsuarioUseCase);
     }
 
     @Bean
@@ -120,11 +129,10 @@ public class UseCaseConfig {
             CarteiraRepository carteiraRepository,
             PerfilRiscoRepository perfilRiscoRepository,
             ScoreCarteiraRepository scoreCarteiraRepository,
-            RecomendacaoRepository recomendacaoRepository,
-            RecommendationTextProvider recommendationTextProvider) {
+            RecomendacaoRepository recomendacaoRepository) {
         return new GerarRecomendacoesCarteiraUseCase(
                 contaRepository, carteiraRepository, perfilRiscoRepository,
-                scoreCarteiraRepository, recomendacaoRepository, recommendationTextProvider);
+                scoreCarteiraRepository, recomendacaoRepository);
     }
 
     @Bean

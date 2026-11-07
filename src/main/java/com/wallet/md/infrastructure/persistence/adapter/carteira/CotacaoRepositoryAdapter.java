@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
@@ -29,6 +30,6 @@ public class CotacaoRepositoryAdapter implements CotacaoRepository {
 
     @Override
     public Optional<BigDecimal> findFirstOfMonthPrecoByAtivoId(Long ativoId, LocalDate mesAno) {
-        return jpaRepository.findFirstOfMonthPrecoByAtivoId(ativoId, mesAno);
+        return jpaRepository.findFirstOfMonthPrecoByAtivoId(ativoId, mesAno.atStartOfDay());
     }
 }

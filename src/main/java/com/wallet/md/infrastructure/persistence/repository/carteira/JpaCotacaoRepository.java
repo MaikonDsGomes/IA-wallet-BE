@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface JpaCotacaoRepository extends JpaRepository<CotacaoEntity, Long> {
@@ -18,5 +18,5 @@ public interface JpaCotacaoRepository extends JpaRepository<CotacaoEntity, Long>
     Optional<BigDecimal> findLatestPrecoByAtivoId(@Param("ativoId") Long ativoId);
 
     @Query("SELECT c.preco FROM CotacaoEntity c WHERE c.ativo.id = :ativoId AND c.coletadoEm >= :mesAno ORDER BY c.coletadoEm ASC LIMIT 1")
-    Optional<BigDecimal> findFirstOfMonthPrecoByAtivoId(@Param("ativoId") Long ativoId, @Param("mesAno") LocalDate mesAno);
+    Optional<BigDecimal> findFirstOfMonthPrecoByAtivoId(@Param("ativoId") Long ativoId, @Param("mesAno") LocalDateTime mesAno);
 }

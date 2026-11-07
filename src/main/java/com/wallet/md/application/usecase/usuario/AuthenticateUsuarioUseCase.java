@@ -8,12 +8,20 @@ import com.wallet.md.domain.service.PasswordEncoderService;
 import com.wallet.md.domain.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 public class AuthenticateUsuarioUseCase {
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoderService passwordEncoder;
     private final TokenProvider tokenProvider;
+
+    public AuthenticateUsuarioUseCase(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoderService passwordEncoder,
+            TokenProvider tokenProvider) {
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.tokenProvider = tokenProvider;
+    }
 
     public AuthResponse execute(LoginRequest request) {
         var usuario = usuarioRepository.findByEmail(request.email())

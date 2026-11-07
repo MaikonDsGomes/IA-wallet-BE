@@ -33,8 +33,8 @@ spring:
 
 jwt:
   secret: Y2hhbmdlLXRoaXMtdG8tYS1zZWN1cmUtcmFuZG9tLWtleS1pbi1wcm9kdWN0aW9uLWVudmlyb25tZW50LXBsZWFzZQ==
-  access-token-expiration: 900000
-  refresh-token-expiration: 604800000
+  access-token-expiration: 0
+  refresh-token-expiration: 0
 
 google:
   client-id: ${GOOGLE_CLIENT_ID:746596332991-idgkstpag27irajp94alpdfec9sl4l47.apps.googleusercontent.com}
@@ -50,11 +50,6 @@ springdoc:
 investwallet:
   recomendacoes:
     cron: ${RECOMENDACOES_CRON:0 0 3 ? * SUN}
-  ia:
-    gemini:
-      enabled: ${GEMINI_ENABLED:false}
-      api-key: ${GEMINI_API_KEY:}
-      model: ${GEMINI_MODEL:gemini-2.0-flash}
 
 logging:
   level:

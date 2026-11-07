@@ -9,6 +9,8 @@ import java.util.List;
 public interface CarteiraRepository {
     Optional<Carteira> findByContaId(Long contaId);
 
+    Carteira createIfAbsent(Long contaId);
+
     Optional<Carteira> findCarteiraIdByUsuarioId(Long usuarioId);
 
     List<Long> findUsuarioIds();

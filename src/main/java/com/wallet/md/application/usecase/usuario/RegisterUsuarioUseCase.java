@@ -18,6 +18,14 @@ public class RegisterUsuarioUseCase {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoderService passwordEncoder;
     private final UsuarioMapper usuarioMapper;
+    private final ProvisionarCarteiraUsuarioUseCase provisionarCarteiraUsuarioUseCase;
+
+    public RegisterUsuarioUseCase(
+            UsuarioRepository usuarioRepository,
+            PasswordEncoderService passwordEncoder,
+            UsuarioMapper usuarioMapper) {
+        this(usuarioRepository, passwordEncoder, usuarioMapper, null);
+    }
 
     public UsuarioResponse execute(RegisterRequest request) {
         if (usuarioRepository.existsByEmail(request.email())) {
@@ -34,6 +42,9 @@ public class RegisterUsuarioUseCase {
                 .build();
 
         var saved = usuarioRepository.save(usuario);
+        if (provisionarCarteiraUsuarioUseCase != null) {
+            provisionarCarteiraUsuarioUseCase.execute(saved.getId());
+        }
         return usuarioMapper.toResponse(saved);
     }
 }

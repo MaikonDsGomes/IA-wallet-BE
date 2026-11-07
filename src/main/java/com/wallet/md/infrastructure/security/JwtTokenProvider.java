@@ -57,12 +57,15 @@ public class JwtTokenProvider implements TokenProvider {
     @Override
     public long getTimeUntilExpiration(String token) {
         try {
-            Date expiration = Jwts.parser()
+            var claims = Jwts.parser()
                     .verifyWith(key)
                     .build()
                     .parseSignedClaims(token)
-                    .getPayload()
-                    .getExpiration();
+                    .getPayload();
+            Date expiration = claims.getExpiration();
+            if (expiration == null) {
+                return Long.MAX_VALUE;
+            }
 
             long remaining = expiration.getTime() - System.currentTimeMillis();
             return Math.max(remaining, 0); // garante que nunca retorna negativo
@@ -93,16 +96,17 @@ public class JwtTokenProvider implements TokenProvider {
 
     private String buildToken(Usuario usuario, long expirationMs, String type) {
         var now = new Date();
-        var expiry = new Date(now.getTime() + expirationMs);
-
-        return Jwts.builder()
+        var builder = Jwts.builder()
                 .subject(String.valueOf(usuario.getId()))
                 .claim("email", usuario.getEmail())
                 .claim("role", usuario.getRole().name())
                 .claim("type", type)
-                .issuedAt(now)
-                .expiration(expiry)
-                .signWith(key)
-                .compact();
+                .issuedAt(now);
+
+        if (expirationMs > 0) {
+            builder.expiration(new Date(now.getTime() + expirationMs));
+        }
+
+        return builder.signWith(key).compact();
     }
 }

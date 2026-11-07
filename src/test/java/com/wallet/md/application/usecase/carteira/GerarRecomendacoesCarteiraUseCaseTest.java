@@ -7,7 +7,6 @@ import com.wallet.md.domain.model.ScoreCarteira;
 import com.wallet.md.domain.model.enums.NivelRisco;
 import com.wallet.md.domain.model.enums.Volatilidade;
 import com.wallet.md.domain.repository.carteira.*;
-import com.wallet.md.application.service.RecommendationTextProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -26,14 +25,12 @@ class GerarRecomendacoesCarteiraUseCaseTest {
     private final PerfilRiscoRepository perfilRepository = mock(PerfilRiscoRepository.class);
     private final ScoreCarteiraRepository scoreRepository = mock(ScoreCarteiraRepository.class);
     private final RecomendacaoRepository recomendacaoRepository = mock(RecomendacaoRepository.class);
-    private final RecommendationTextProvider textProvider = mock(RecommendationTextProvider.class);
     private GerarRecomendacoesCarteiraUseCase useCase;
 
     @BeforeEach
     void setUp() {
         useCase = new GerarRecomendacoesCarteiraUseCase(
-                contaRepository, carteiraRepository, perfilRepository, scoreRepository, recomendacaoRepository,
-                textProvider);
+                contaRepository, carteiraRepository, perfilRepository, scoreRepository, recomendacaoRepository);
     }
 
     @Test
@@ -44,46 +41,6 @@ class GerarRecomendacoesCarteiraUseCaseTest {
         useCase.gerar(1L);
 
         verify(recomendacaoRepository).substituirAtivas(eq(10L), anyList());
-    }
-
-    @Test
-    void devePersistirTextoPersonalizadoPeloProvedor() {
-        givenCarteira();
-        whenScore(45, 50, 55, 80, Volatilidade.Media);
-        when(textProvider.improve(any(), any(), any())).thenAnswer(invocation -> {
-            var original = invocation.getArgument(0, com.wallet.md.domain.model.Recomendacao.class);
-            return com.wallet.md.domain.model.Recomendacao.builder()
-                    .id(original.getId())
-                    .carteiraId(original.getCarteiraId())
-                    .titulo("Texto personalizado")
-                    .descricao(original.getDescricao())
-                    .categoria(original.getCategoria())
-                    .prioridade(original.getPrioridade())
-                    .impactoPts(original.getImpactoPts())
-                    .ativa(original.getAtiva())
-                    .geradaEm(original.getGeradaEm())
-                    .build();
-        });
-
-        useCase.gerar(1L);
-
-        verify(textProvider, atLeastOnce()).improve(any(), any(), any());
-        verify(recomendacaoRepository).substituirAtivas(eq(10L),
-                argThat(recomendacoes -> recomendacoes.stream()
-                        .anyMatch(recomendacao -> recomendacao.getTitulo().equals("Texto personalizado"))));
-    }
-
-    @Test
-    void deveUsarTextoDeterministicoQuandoProvedorFalhar() {
-        givenCarteira();
-        whenScore(45, 50, 55, 80, Volatilidade.Media);
-        when(textProvider.improve(any(), any(), any())).thenThrow(new RuntimeException("indisponível"));
-
-        useCase.gerar(1L);
-
-        verify(recomendacaoRepository).substituirAtivas(eq(10L),
-                argThat(recomendacoes -> recomendacoes.stream()
-                        .anyMatch(recomendacao -> recomendacao.getTitulo().equals("Revise o risco da carteira"))));
     }
 
     @Test
