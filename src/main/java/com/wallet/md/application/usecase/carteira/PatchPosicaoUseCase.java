@@ -5,6 +5,7 @@ import com.wallet.md.domain.repository.carteira.AtivoRepository;
 import com.wallet.md.domain.repository.carteira.CarteiraRepository;
 import com.wallet.md.domain.repository.carteira.PosicaoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -13,7 +14,14 @@ public class PatchPosicaoUseCase {
     private final CarteiraRepository carteiraRepository;
     private final AtivoRepository ativoRepository;
     private final PosicaoRepository posicaoRepository;
+    private final AgendarRecalculoScoreUseCase agendarRecalculoScoreUseCase;
 
+    public PatchPosicaoUseCase(CarteiraRepository carteiraRepository, AtivoRepository ativoRepository,
+                               PosicaoRepository posicaoRepository) {
+        this(carteiraRepository, ativoRepository, posicaoRepository, null);
+    }
+
+    @Transactional
     public void vendaAtivo(Long usuarioId, Long ativoId, Integer quantidade, BigDecimal precoUnitario) {
         var carteira = carteiraRepository.findCarteiraIdByUsuarioId(usuarioId)
                 .orElseThrow(() -> new NotFoundException("Carteira não encontrada"));
@@ -25,6 +33,9 @@ public class PatchPosicaoUseCase {
                 .orElseThrow(() -> new NotFoundException("Posição não encontrada para o ativo na carteira"));
 
         posicaoRepository.updateQuantidadeVenda(carteira.getId(), ativo.getId(), quantidade, precoUnitario);
+        if (agendarRecalculoScoreUseCase != null) {
+            agendarRecalculoScoreUseCase.agendar(carteira.getId());
+        }
     }
 
 }

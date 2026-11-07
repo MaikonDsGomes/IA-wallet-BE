@@ -63,6 +63,26 @@ O motor de recomendações é determinístico e usa o score da carteira, o perfi
 
 O endpoint de recomendações retorna também metadados de apresentação (`tipo`, `cor`, `icone` e `acaoSugerida`), permitindo que o frontend monte cards sem interpretar textos ou depender de IA.
 
+### Serviço genérico de e-mail
+
+O envio é exposto internamente por `EmailSenderPort`, com `EmailMessage` contendo destinatário, assunto, corpo e formato (`PLAIN_TEXT` ou `HTML`). `SendEmailUseCase` oferece o contrato simples `sendEmail(destination, subject, body)` e também aceita o formato explicitamente. Nenhum consumidor importa SDK ou classe do provedor.
+
+O adapter atual é `ResendEmailAdapter`, que usa a API HTTP do Resend. A seleção é feita por `notification.email.provider`; `resend` e `default` usam esse adapter. O recurso inicia desabilitado por padrão (`EMAIL_ENABLED=false`) e só exige `EMAIL_API_KEY` e `EMAIL_FROM` quando habilitado. Erros HTTP, rate limit, timeout e falhas de rede são convertidos em `EmailIntegrationException`; logs registram somente provider e status, sem API key, destinatário, assunto ou corpo.
+
+O Resend foi escolhido por oferecer API REST simples, suporte a texto/HTML, remetente verificado e plano gratuito atualmente anunciado de 3.000 e-mails/mês, limitado a 100 por dia. O setup exige criar uma conta, gerar uma API key e verificar um remetente ou domínio, sem incluir credenciais no repositório. O plano e seus limites podem mudar; consultar a página oficial antes de produção.
+
+### Motor de score
+
+`CalcularScoreCarteiraUseCase` calcula o score a partir das posições, preço mais recente disponível, classe do ativo, volatilidade cadastrada e perfil de risco. A diversificação combina quantidade de ativos, quantidade de classes e concentração; a concentração combina concentração máxima e HHI; o risco usa volatilidade média ponderada, desalinhamento com a tolerância do perfil e concentração estrutural. Os pesos configuráveis são diversificação 25%, risco 30%, concentração 25% e performance 20%.
+
+O score integral usa `MarketSeriesRepository` para séries persistidas de ativos, CDI e Ibovespa. O histórico de ativos usa `adjustedClose` quando fornecido pela fonte, evitando misturar preços não ajustados com retornos. Volatilidade histórica, beta, VaR 95%, Sharpe e comparações com benchmarks só são preenchidos quando a janela possui o mínimo configurado de observações alinhadas; caso contrário permanecem nulos, o status é `PARCIAL` e o total é renormalizado entre dimensões disponíveis.
+
+O provider externo é o adapter substituível `BrapiMarketDataProvider`, desabilitado por padrão (`MARKET_DATA_ENABLED=false`). A chave é lida somente de `BRAPI_API_KEY`; o adapter aplica retry limitado e não impede o startup sem credencial. A brapi fornece histórico ajustado e macro conforme o plano contratado, mas possui limites de cobertura, janela histórica e requisições. A ingestão diária é delegada por `MarketDataScheduler` para `IngerirDadosMercadoUseCase`, usa upsert idempotente em `market_series` e não é executada durante compra/venda.
+
+Setores são administrados em `ativo_setor`, com `DESCONHECIDO` explícito. Esse valor não é contado como setor diversificador. Para renda fixa e ativos sem classificação aplicável, a ausência permanece explícita; o motor não infere setor por nome ou ticker.
+
+Alterações efetivas de posição criam ou reiniciam um registro em `recalculo_score` para dez minutos após a última alteração. `ScoreRecalculoScheduler` apenas localiza registros vencidos; `ProcessarRecalculoScoreUseCase` usa lock pessimista, tentativas, recuperação de processamento obsoleto e versão da alteração. O score é persistido antes da atualização das recomendações, e falha de recomendação não desfaz o score.
+
 ## 3. Camada de aplicação
 
 Localização: `src/main/java/com/wallet/md/application`
@@ -122,6 +142,8 @@ O banco principal é MySQL. O Hibernate está configurado com `ddl-auto: none`; 
 - `V1__create_schema_investwallet.sql`: schema inicial e relacionamentos.
 - `V2__mock_data.sql`: dados de demonstração.
 - `V3__add_codigo_ativo.sql`: inclusão do código/ticker em `ativo`.
+- `V6__motor_score_e_agendamento.sql`: campos/versionamento do score e agendamento persistente com debounce.
+- `V7__dados_mercado_score_integral.sql`: séries históricas de mercado e classificação setorial administrável.
 
 ### Segurança
 

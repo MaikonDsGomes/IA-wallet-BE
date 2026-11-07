@@ -14,9 +14,17 @@ import com.wallet.md.application.usecase.carteira.GetOrdensContaUseCase;
 import com.wallet.md.application.usecase.carteira.ComprarPosicaoUseCase;
 import com.wallet.md.application.usecase.carteira.GetCarteiraKpisUseCase;
 import com.wallet.md.application.usecase.carteira.GetEvolucaoCarteiraUseCase;
+import com.wallet.md.application.usecase.carteira.CalcularScoreCarteiraUseCase;
+import com.wallet.md.application.usecase.carteira.AgendarRecalculoScoreUseCase;
+import com.wallet.md.application.usecase.carteira.ProcessarRecalculoScoreUseCase;
+import com.wallet.md.application.usecase.mercado.IngerirDadosMercadoUseCase;
+import com.wallet.md.application.usecase.notification.SendEmailUseCase;
 import com.wallet.md.application.usecase.ativo.GetAtivosPorTicket;
 import com.wallet.md.application.usecase.usuario.*;
 import com.wallet.md.domain.repository.carteira.*;
+import com.wallet.md.domain.repository.mercado.AtivoSetorRepository;
+import com.wallet.md.domain.repository.mercado.MarketSeriesRepository;
+import com.wallet.md.domain.repository.mercado.MarketDataProvider;
 import com.wallet.md.domain.repository.ativo.CotacaoAtivoRepository;
 import com.wallet.md.domain.repository.ativo.AtivoRepository;
 import com.wallet.md.domain.repository.usuario.UsuarioRepository;
@@ -54,8 +62,10 @@ public class UseCaseConfig {
     public PostPosicaoUseCase adicionarPosicaoUseCase(
             CarteiraRepository carteiraRepository,
             com.wallet.md.domain.repository.carteira.AtivoRepository ativoRepository,
-            PosicaoRepository posicaoRepository) {
-        return new PostPosicaoUseCase(carteiraRepository, ativoRepository, posicaoRepository);
+            PosicaoRepository posicaoRepository,
+            AgendarRecalculoScoreUseCase agendarRecalculoScoreUseCase) {
+        return new PostPosicaoUseCase(carteiraRepository, ativoRepository, posicaoRepository,
+                agendarRecalculoScoreUseCase);
     }
 
     @Bean
@@ -68,8 +78,9 @@ public class UseCaseConfig {
     @Bean
     public DeletePosicaoUseCase deletePosicaoUseCase(
             CarteiraRepository carteiraRepository,
-            PosicaoRepository posicaoRepository) {
-        return new DeletePosicaoUseCase(carteiraRepository, posicaoRepository);
+            PosicaoRepository posicaoRepository,
+            AgendarRecalculoScoreUseCase agendarRecalculoScoreUseCase) {
+        return new DeletePosicaoUseCase(carteiraRepository, posicaoRepository, agendarRecalculoScoreUseCase);
     }
     @Bean
     public AuthenticateUsuarioUseCase authenticateUsuarioUseCase(
@@ -111,8 +122,61 @@ public class UseCaseConfig {
     }
 
     @Bean
-    public GetScoreCarteiraUseCase getScoreCarteiraUseCase(ContaRepository contaRepository, CarteiraRepository carteiraRepository, ScoreCarteiraRepository scoreCarteiraRepository) {
-        return new GetScoreCarteiraUseCase(contaRepository, carteiraRepository, scoreCarteiraRepository);
+    public GetScoreCarteiraUseCase getScoreCarteiraUseCase(
+            ContaRepository contaRepository,
+            CarteiraRepository carteiraRepository,
+            ScoreCarteiraRepository scoreCarteiraRepository,
+            com.wallet.md.infrastructure.config.ScoreMetodologiaProperties properties) {
+        return new GetScoreCarteiraUseCase(contaRepository, carteiraRepository, scoreCarteiraRepository, properties);
+    }
+
+    @Bean
+    public CalcularScoreCarteiraUseCase calcularScoreCarteiraUseCase(
+            CarteiraRepository carteiraRepository,
+            PosicaoRepository posicaoRepository,
+            CotacaoRepository cotacaoRepository,
+            PerfilRiscoRepository perfilRiscoRepository,
+            ScoreCarteiraRepository scoreCarteiraRepository,
+            com.wallet.md.infrastructure.config.ScoreMetodologiaProperties properties,
+            MarketSeriesRepository marketSeriesRepository,
+            AtivoSetorRepository ativoSetorRepository) {
+        return new CalcularScoreCarteiraUseCase(carteiraRepository, posicaoRepository, cotacaoRepository,
+                perfilRiscoRepository, scoreCarteiraRepository, properties, marketSeriesRepository,
+                ativoSetorRepository);
+    }
+
+    @Bean
+    public AgendarRecalculoScoreUseCase agendarRecalculoScoreUseCase(
+            RecalculoScoreRepository recalculoScoreRepository,
+            com.wallet.md.infrastructure.config.ScoreMetodologiaProperties properties) {
+        return new AgendarRecalculoScoreUseCase(recalculoScoreRepository, properties);
+    }
+
+    @Bean
+    public ProcessarRecalculoScoreUseCase processarRecalculoScoreUseCase(
+            RecalculoScoreRepository recalculoScoreRepository,
+            CarteiraRepository carteiraRepository,
+            CalcularScoreCarteiraUseCase calcularScoreCarteiraUseCase,
+            GerarRecomendacoesCarteiraUseCase gerarRecomendacoesCarteiraUseCase,
+            com.wallet.md.infrastructure.config.ScoreMetodologiaProperties properties) {
+        return new ProcessarRecalculoScoreUseCase(recalculoScoreRepository, carteiraRepository,
+                calcularScoreCarteiraUseCase, gerarRecomendacoesCarteiraUseCase, properties);
+    }
+
+    @Bean
+    public IngerirDadosMercadoUseCase ingerirDadosMercadoUseCase(
+            PosicaoRepository posicaoRepository,
+            MarketDataProvider marketDataProvider,
+            MarketSeriesRepository marketSeriesRepository,
+            MarketDataProperties marketDataProperties) {
+        return new IngerirDadosMercadoUseCase(posicaoRepository, marketDataProvider,
+                marketSeriesRepository, marketDataProperties);
+    }
+
+    @Bean
+    public SendEmailUseCase sendEmailUseCase(
+            com.wallet.md.domain.repository.notification.EmailSenderPort emailSenderPort) {
+        return new SendEmailUseCase(emailSenderPort);
     }
 
     @Bean
@@ -147,9 +211,10 @@ public class UseCaseConfig {
             CarteiraRepository carteiraRepository,
             PosicaoRepository posicaoRepository,
             OrdemRepository ordemRepository,
-            MovimentacaoRepository movimentacaoRepository) {
+            MovimentacaoRepository movimentacaoRepository,
+            AgendarRecalculoScoreUseCase agendarRecalculoScoreUseCase) {
         return new VenderPosicaoUseCase(contaRepository, carteiraRepository, posicaoRepository,
-                ordemRepository, movimentacaoRepository);
+                ordemRepository, movimentacaoRepository, agendarRecalculoScoreUseCase);
     }
 
     @Bean
@@ -170,9 +235,10 @@ public class UseCaseConfig {
             CarteiraRepository carteiraRepository,
             PosicaoRepository posicaoRepository,
             OrdemRepository ordemRepository,
-            MovimentacaoRepository movimentacaoRepository) {
+            MovimentacaoRepository movimentacaoRepository,
+            AgendarRecalculoScoreUseCase agendarRecalculoScoreUseCase) {
         return new ComprarPosicaoUseCase(contaRepository, carteiraRepository, posicaoRepository,
-                ordemRepository, movimentacaoRepository);
+                ordemRepository, movimentacaoRepository, agendarRecalculoScoreUseCase);
     }
 
     @Bean

@@ -1,6 +1,7 @@
 package com.wallet.md.domain.model;
 
 import com.wallet.md.domain.model.enums.Volatilidade;
+import com.wallet.md.domain.model.enums.StatusScore;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -33,4 +34,7 @@ public class ScoreCarteira {
     private BigDecimal vsIbov;
     private BigDecimal sharpeRatio;
     private LocalDateTime calculadoEm;
+    private StatusScore status;
+    private String versaoMetodologia;
+    private String perfilRisco;
 }

@@ -13,5 +13,7 @@ public interface CarteiraRepository {
 
     Optional<Carteira> findCarteiraIdByUsuarioId(Long usuarioId);
 
+    Optional<Long> findUsuarioIdByCarteiraId(Long carteiraId);
+
     List<Long> findUsuarioIds();
 }

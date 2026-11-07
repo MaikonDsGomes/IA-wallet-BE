@@ -23,6 +23,14 @@ public class VenderPosicaoUseCase {
     private final PosicaoRepository posicaoRepository;
     private final OrdemRepository ordemRepository;
     private final MovimentacaoRepository movimentacaoRepository;
+    private final AgendarRecalculoScoreUseCase agendarRecalculoScoreUseCase;
+
+    public VenderPosicaoUseCase(ContaRepository contaRepository, CarteiraRepository carteiraRepository,
+                                PosicaoRepository posicaoRepository, OrdemRepository ordemRepository,
+                                MovimentacaoRepository movimentacaoRepository) {
+        this(contaRepository, carteiraRepository, posicaoRepository, ordemRepository,
+                movimentacaoRepository, null);
+    }
 
     @Transactional
     public VendaPosicaoResponse vender(Long usuarioId, VendaPosicaoRequest request) {
@@ -53,6 +61,9 @@ public class VenderPosicaoUseCase {
                 .valor(valorBruto)
                 .data(executadaEm)
                 .build());
+        if (agendarRecalculoScoreUseCase != null) {
+            agendarRecalculoScoreUseCase.agendar(carteira.getId());
+        }
 
         return new VendaPosicaoResponse(
                 ordemId, request.ativoId(), request.quantidade(), request.precoUnitario(),

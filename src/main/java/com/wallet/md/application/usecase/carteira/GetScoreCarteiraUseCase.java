@@ -6,6 +6,7 @@ import com.wallet.md.domain.repository.carteira.CarteiraRepository;
 import com.wallet.md.domain.repository.carteira.ContaRepository;
 import com.wallet.md.domain.repository.carteira.PerfilRiscoRepository;
 import com.wallet.md.domain.repository.carteira.ScoreCarteiraRepository;
+import com.wallet.md.infrastructure.config.ScoreMetodologiaProperties;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -15,6 +16,12 @@ public class GetScoreCarteiraUseCase {
     private final ContaRepository contaRepository;
     private final CarteiraRepository carteiraRepository;
     private final ScoreCarteiraRepository scoreCarteiraRepository;
+    private final ScoreMetodologiaProperties properties;
+
+    public GetScoreCarteiraUseCase(ContaRepository contaRepository, CarteiraRepository carteiraRepository,
+                                   ScoreCarteiraRepository scoreCarteiraRepository) {
+        this(contaRepository, carteiraRepository, scoreCarteiraRepository, new ScoreMetodologiaProperties());
+    }
 
     public ScoreCarteiraResponse getScore(Long usuarioId) {
         var conta = contaRepository.findByUsuarioId(usuarioId)
@@ -34,7 +41,7 @@ public class GetScoreCarteiraUseCase {
                 score.getNumClasses(),
                 score.getConcentracaoMaxima(),
                 score.getScoreRisco(),
-                score.getVolatilidade().name(),
+                score.getVolatilidade() == null ? null : score.getVolatilidade().name(),
                 score.getBetaCarteira(),
                 score.getVar95(),
                 score.getScoreConcentracao(),
@@ -45,15 +52,20 @@ public class GetScoreCarteiraUseCase {
                 score.getVsCdi(),
                 score.getVsIbov(),
                 score.getSharpeRatio(),
-                score.getCalculadoEm()
+                score.getCalculadoEm(),
+                score.getStatus() == null ? null : score.getStatus().name(),
+                score.getVersaoMetodologia(),
+                score.getPerfilRisco()
         );
     }
 
     private String resolverClassificacao(Integer score) {
-        if (score >= 90) return "Excelente";
-        if (score >= 75) return "Bom";
-        if (score >= 60) return "Regular";
-        if (score >= 40) return "Atenção";
+        if (score == null) return "Pendente";
+        var classificacao = properties.getClassificacao();
+        if (score > classificacao.getMuitoBomMax()) return "Excelente";
+        if (score > classificacao.getBomMax()) return "Muito bom";
+        if (score > classificacao.getAtencaoMax()) return "Bom";
+        if (score > classificacao.getCriticoMax()) return "Atenção";
         return "Crítico";
     }
 }

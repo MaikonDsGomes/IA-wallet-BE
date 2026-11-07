@@ -8,6 +8,7 @@ import com.wallet.md.infrastructure.persistence.repository.JpaScoreCarteiraRepos
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
+import com.wallet.md.infrastructure.persistence.entity.CarteiraEntity;
 
 @Repository
 @RequiredArgsConstructor
@@ -19,6 +20,39 @@ public class ScoreCarteiraRepositoryAdapter implements ScoreCarteiraRepository {
     public Optional<ScoreCarteira> findLatestByCarteiraId(Long carteiraId) {
         return jpaRepository.findTopByCarteiraIdOrderByCalculadoEmDesc(carteiraId)
                 .map(this::toDomain);
+    }
+
+    @Override
+    public ScoreCarteira save(ScoreCarteira score) {
+        var carteira = new CarteiraEntity();
+        carteira.setId(score.getCarteiraId());
+        var entity = ScoreCarteiraEntity.builder()
+                .id(score.getId())
+                .carteira(carteira)
+                .scoreTotal(score.getScoreTotal())
+                .scoreDiversificacao(score.getScoreDiversificacao())
+                .scoreRisco(score.getScoreRisco())
+                .scoreConcentracao(score.getScoreConcentracao())
+                .scorePerformance(score.getScorePerformance())
+                .numAtivos(score.getNumAtivos())
+                .numClasses(score.getNumClasses())
+                .concentracaoMaxima(score.getConcentracaoMaxima())
+                .top3Concentracao(score.getTop3Concentracao())
+                .indiceHerfindahl(score.getIndiceHerfindahl())
+                .numSetores(score.getNumSetores())
+                .volatilidade(score.getVolatilidade() == null ? null
+                        : ScoreCarteiraEntity.Volatilidade.valueOf(score.getVolatilidade().name()))
+                .betaCarteira(score.getBetaCarteira())
+                .var95(score.getVar95())
+                .vsCdi(score.getVsCdi())
+                .vsIbov(score.getVsIbov())
+                .sharpeRatio(score.getSharpeRatio())
+                .calculadoEm(score.getCalculadoEm())
+                .status(score.getStatus())
+                .versaoMetodologia(score.getVersaoMetodologia())
+                .perfilRisco(score.getPerfilRisco())
+                .build();
+        return toDomain(jpaRepository.save(entity));
     }
 
     private ScoreCarteira toDomain(ScoreCarteiraEntity entity) {
@@ -43,6 +77,9 @@ public class ScoreCarteiraRepositoryAdapter implements ScoreCarteiraRepository {
                 .vsIbov(entity.getVsIbov())
                 .sharpeRatio(entity.getSharpeRatio())
                 .calculadoEm(entity.getCalculadoEm())
+                .status(entity.getStatus())
+                .versaoMetodologia(entity.getVersaoMetodologia())
+                .perfilRisco(entity.getPerfilRisco())
                 .build();
     }
 }

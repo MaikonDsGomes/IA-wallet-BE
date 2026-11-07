@@ -33,8 +33,26 @@ public record ScoreCarteiraResponse(
         BigDecimal vsIbov,
         BigDecimal sharpeRatio,
 
-        LocalDateTime calculadoEm
+        LocalDateTime calculadoEm,
+        String status,
+        String versaoMetodologia,
+        String perfilRisco
 ) {
+    public ScoreCarteiraResponse(
+            Integer scoreTotal, String classificacao, Integer scoreDiversificacao,
+            Integer numAtivos, Integer numClasses, BigDecimal concentracaoMaxima,
+            Integer scoreRisco, String volatilidade, BigDecimal betaCarteira,
+            BigDecimal var95, Integer scoreConcentracao, BigDecimal top3Concentracao,
+            BigDecimal indiceHerfindahl, Integer numSetores, Integer scorePerformance,
+            BigDecimal vsCdi, BigDecimal vsIbov, BigDecimal sharpeRatio,
+            LocalDateTime calculadoEm) {
+        this(scoreTotal, classificacao, scoreDiversificacao, numAtivos, numClasses,
+                concentracaoMaxima, scoreRisco, volatilidade, betaCarteira, var95,
+                scoreConcentracao, top3Concentracao, indiceHerfindahl, numSetores,
+                scorePerformance, vsCdi, vsIbov, sharpeRatio, calculadoEm,
+                "COMPLETO", "v1", null);
+    }
+
     @com.fasterxml.jackson.annotation.JsonProperty("interpretacaoDiversificacao")
     public String interpretacaoDiversificacao() {
         return scoreDiversificacao == null ? null : scoreDiversificacao >= 80

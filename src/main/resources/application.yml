@@ -50,6 +50,69 @@ springdoc:
 investwallet:
   recomendacoes:
     cron: ${RECOMENDACOES_CRON:0 0 3 ? * SUN}
+  score:
+    metodologia-versao: ${SCORE_METODOLOGIA_VERSAO:v1}
+    debounce-minutos: ${SCORE_DEBOUNCE_MINUTOS:10}
+    intervalo-scheduler-segundos: ${SCORE_SCHEDULER_INTERVALO_SEGUNDOS:60}
+    stale-processing-minutos: ${SCORE_STALE_PROCESSING_MINUTOS:15}
+    max-tentativas: ${SCORE_MAX_TENTATIVAS:5}
+    classificacao:
+      critico-max: 39
+      atencao-max: 59
+      bom-max: 79
+      muito-bom-max: 89
+    pesos:
+      diversificacao: 0.25
+      risco: 0.30
+      concentracao: 0.25
+      performance: 0.20
+    regras:
+      pontos-por-ativo: 20
+      pontos-por-classe: 33.3333
+      penalidade-concentracao: 1.5
+      penalidade-volatilidade: 10
+      penalidade-desalinhamento-perfil: 10
+      limite-concentracao-estrutural: 40
+      peso-concentracao-maxima: 0.60
+      peso-hhi: 0.40
+      volatilidade-baixa-max: 3
+      volatilidade-media-max: 6
+    perfis:
+      CONSERVADOR:
+        volatilidade-maxima: 3
+      MODERADO:
+        volatilidade-maxima: 6
+      AGRESSIVO:
+        volatilidade-maxima: 9
+    performance:
+      historico-dias: ${SCORE_PERFORMANCE_HISTORICO_DIAS:365}
+      min-observacoes: ${SCORE_PERFORMANCE_MIN_OBSERVACOES:60}
+      benchmark-instrument: ${SCORE_BENCHMARK_INSTRUMENT:^BVSP}
+      cdi-instrument: ${SCORE_CDI_INSTRUMENT:cdi}
+  market:
+    enabled: ${MARKET_DATA_ENABLED:false}
+    historico-dias: ${MARKET_DATA_HISTORICO_DIAS:365}
+    cron: ${MARKET_DATA_CRON:0 30 19 * * MON-FRI}
+    benchmark-symbol: ${MARKET_DATA_BENCHMARK_SYMBOL:^BVSP}
+    cdi-symbol: ${MARKET_DATA_CDI_SYMBOL:cdi}
+    provider:
+      name: ${MARKET_DATA_PROVIDER:brapi}
+      base-url: ${BRAPI_BASE_URL:https://brapi.dev/api}
+      api-key: ${BRAPI_API_KEY:}
+      asset-range: ${BRAPI_ASSET_RANGE:1y}
+      max-attempts: ${BRAPI_MAX_ATTEMPTS:3}
+      benchmark-symbol: ${MARKET_DATA_BENCHMARK_SYMBOL:^BVSP}
+      cdi-symbol: ${MARKET_DATA_CDI_SYMBOL:cdi}
+
+notification:
+  email:
+    enabled: ${EMAIL_ENABLED:false}
+    provider: ${EMAIL_PROVIDER:resend}
+    api-key: ${EMAIL_API_KEY:}
+    from: ${EMAIL_FROM:}
+    base-url: ${EMAIL_BASE_URL:https://api.resend.com}
+    timeout-seconds: ${EMAIL_TIMEOUT_SECONDS:10}
+    max-attempts: ${EMAIL_MAX_ATTEMPTS:2}
 
 logging:
   level:

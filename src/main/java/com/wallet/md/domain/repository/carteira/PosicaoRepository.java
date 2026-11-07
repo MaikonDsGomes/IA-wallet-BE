@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface PosicaoRepository {
     List<PosicaoComClasseProjection> findByCarteiraId(Long carteiraId);
 
+    List<PosicaoComClasseProjection> findAllForMarketData();
+
     List<PosicaoDetalhadaProjection> findDetalhadaByCarteiraId(Long carteiraId, TipoAtivo tipo);
 
     void save(Long carteiraId, Long ativoId, Integer quantidade, BigDecimal precoMedio);

@@ -6,6 +6,7 @@ import com.wallet.md.domain.repository.carteira.AtivoRepository;
 import com.wallet.md.domain.repository.carteira.CarteiraRepository;
 import com.wallet.md.domain.repository.carteira.PosicaoRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 public class PostPosicaoUseCase {
@@ -13,7 +14,14 @@ public class PostPosicaoUseCase {
     private final CarteiraRepository carteiraRepository;
     private final AtivoRepository ativoRepository;
     private final PosicaoRepository posicaoRepository;
+    private final AgendarRecalculoScoreUseCase agendarRecalculoScoreUseCase;
 
+    public PostPosicaoUseCase(CarteiraRepository carteiraRepository, AtivoRepository ativoRepository,
+                              PosicaoRepository posicaoRepository) {
+        this(carteiraRepository, ativoRepository, posicaoRepository, null);
+    }
+
+    @Transactional
     public void post(Long usuarioId, PostPosicaoRequest request) {
 
         var carteira = carteiraRepository.findCarteiraIdByUsuarioId(usuarioId)
@@ -34,5 +42,8 @@ public class PostPosicaoUseCase {
                 request.quantidade(),
                 request.precoMedio()
         );
+        if (agendarRecalculoScoreUseCase != null) {
+            agendarRecalculoScoreUseCase.agendar(carteira.getId());
+        }
     }
 }

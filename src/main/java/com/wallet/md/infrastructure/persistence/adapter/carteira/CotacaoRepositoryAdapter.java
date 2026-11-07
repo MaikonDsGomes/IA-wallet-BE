@@ -25,7 +25,15 @@ public class CotacaoRepositoryAdapter implements CotacaoRepository {
 
     @Override
     public Cotacao findLatestByAtivoId(Long ativoId) {
-        return null;
+        return jpaRepository.findLatestByAtivoId(ativoId)
+                .map(entity -> Cotacao.builder()
+                        .id(entity.getId())
+                        .ativoId(entity.getAtivo().getId())
+                        .preco(entity.getPreco())
+                        .variacao(entity.getVariacao())
+                        .coletadoEm(entity.getColetadoEm())
+                        .build())
+                .orElse(null);
     }
 
     @Override

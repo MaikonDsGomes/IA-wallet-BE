@@ -32,6 +32,11 @@ public class PosicaoRepositoryAdapter implements PosicaoRepository {
     }
 
     @Override
+    public List<PosicaoComClasseProjection> findAllForMarketData() {
+        return jpaRepository.findAllForMarketData();
+    }
+
+    @Override
     public List<PosicaoDetalhadaProjection> findDetalhadaByCarteiraId(Long carteiraId, TipoAtivo tipo) {
         return jpaRepository.findDetalhadaByCarteiraId(carteiraId, tipo);
     }

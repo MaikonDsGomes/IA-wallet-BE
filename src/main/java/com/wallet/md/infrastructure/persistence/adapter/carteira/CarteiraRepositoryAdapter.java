@@ -44,6 +44,11 @@ public class CarteiraRepositoryAdapter implements CarteiraRepository {
         return jpaRepository.findUsuarioIds();
     }
 
+    @Override
+    public Optional<Long> findUsuarioIdByCarteiraId(Long carteiraId) {
+        return jpaRepository.findUsuarioIdByCarteiraId(carteiraId);
+    }
+
     private Carteira toDomain(CarteiraEntity entity) {
         return Carteira.builder()
                 .id(entity.getId())

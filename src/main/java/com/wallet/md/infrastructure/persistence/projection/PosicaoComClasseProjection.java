@@ -7,7 +7,9 @@ public interface PosicaoComClasseProjection {
     Long getId();
     Long getCarteiraId();
     Long getAtivoId();
+    String getAtivoCodigo();
     Integer getQuantidade();
     BigDecimal getPrecoMedio();
     String getAtivoClasse();  // vem do JOIN com ativo
+    Integer getAtivoVolatilidade();
 }

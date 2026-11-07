@@ -14,4 +14,7 @@ public interface JpaCarteiraRepository extends JpaRepository<CarteiraEntity, Lon
 
     @Query("select c.conta.usuario.id from CarteiraEntity c")
     List<Long> findUsuarioIds();
+
+    @Query("select c.conta.usuario.id from CarteiraEntity c where c.id = :carteiraId")
+    Optional<Long> findUsuarioIdByCarteiraId(@org.springframework.data.repository.query.Param("carteiraId") Long carteiraId);
 }

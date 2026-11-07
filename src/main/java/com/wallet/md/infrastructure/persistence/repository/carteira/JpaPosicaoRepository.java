@@ -18,14 +18,29 @@ public interface JpaPosicaoRepository extends JpaRepository<PosicaoEntity, Long>
     @Query("""
         SELECT
             p.ativo.id     AS ativoId,
+            p.ativo.codigo AS ativoCodigo,
             p.quantidade   AS quantidade,
             p.precoMedio   AS precoMedio,
             p.ativo.tipo   AS ativoClasse
+            ,p.ativo.volatilidade AS ativoVolatilidade
         FROM PosicaoEntity p
         JOIN p.ativo a
         WHERE p.carteira.id = :carteiraId
     """)
     List<PosicaoComClasseProjection> findByCarteiraId(@Param("carteiraId") Long carteiraId);
+
+    @Query("""
+        SELECT
+            p.ativo.id AS ativoId,
+            p.ativo.codigo AS ativoCodigo,
+            p.quantidade AS quantidade,
+            p.precoMedio AS precoMedio,
+            p.ativo.tipo AS ativoClasse,
+            p.ativo.volatilidade AS ativoVolatilidade
+        FROM PosicaoEntity p
+        JOIN p.ativo a
+    """)
+    List<PosicaoComClasseProjection> findAllForMarketData();
 
     @Query("""
         SELECT
