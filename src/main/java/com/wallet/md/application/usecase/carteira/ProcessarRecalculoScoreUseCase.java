@@ -1,11 +1,13 @@
 package com.wallet.md.application.usecase.carteira;
 
+import com.wallet.md.application.event.ScoreRecalculatedEvent;
 import com.wallet.md.domain.model.enums.StatusRecalculoScore;
 import com.wallet.md.domain.repository.carteira.CarteiraRepository;
 import com.wallet.md.domain.repository.carteira.RecalculoScoreRepository;
 import com.wallet.md.infrastructure.config.ScoreMetodologiaProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -19,6 +21,7 @@ public class ProcessarRecalculoScoreUseCase {
     private final CalcularScoreCarteiraUseCase calcularScoreCarteiraUseCase;
     private final GerarRecomendacoesCarteiraUseCase gerarRecomendacoesCarteiraUseCase;
     private final ScoreMetodologiaProperties properties;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void processar(Long recalculoId) {
@@ -56,6 +59,8 @@ public class ProcessarRecalculoScoreUseCase {
             atualizado.setStatus(StatusRecalculoScore.CONCLUIDO);
             atualizado.setProcessadoEm(LocalDateTime.now());
             recalculoRepository.save(atualizado);
+            eventPublisher.publishEvent(new ScoreRecalculatedEvent(
+                    atualizado.getId(), atualizado.getCarteiraId()));
         } catch (RuntimeException exception) {
             var atual = recalculoRepository.findByIdForUpdate(recalculoId).orElseThrow();
             atual.setUltimoErro(exception.getMessage());

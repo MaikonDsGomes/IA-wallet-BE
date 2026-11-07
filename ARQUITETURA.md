@@ -71,6 +71,10 @@ O adapter atual é `ResendEmailAdapter`, que usa a API HTTP do Resend. A seleç�
 
 O Resend foi escolhido por oferecer API REST simples, suporte a texto/HTML, remetente verificado e plano gratuito atualmente anunciado de 3.000 e-mails/mês, limitado a 100 por dia. O setup exige criar uma conta, gerar uma API key e verificar um remetente ou domínio, sem incluir credenciais no repositório. O plano e seus limites podem mudar; consultar a página oficial antes de produção.
 
+Após o processamento concluído do score, `ProcessarRecalculoScoreUseCase` publica `ScoreRecalculatedEvent`. O listener é executado somente após o commit e de forma assíncrona, resolve o proprietário pela relação carteira → conta → usuário e reutiliza `SendEmailUseCase`. O texto não inclui pontuação nem dados financeiros sensíveis.
+
+`score_email_notification` mantém um registro único por processamento. Status `ENVIADO` impede duplicidade em reprocessamentos; falhas ficam registradas como `FALHO` e não reabrem o cálculo nem desfazem score/recomendações. Não há retry automático de e-mail nesta versão; uma futura rotina poderá reprocessar somente notificações falhas.
+
 ### Motor de score
 
 `CalcularScoreCarteiraUseCase` calcula o score a partir das posições, preço mais recente disponível, classe do ativo, volatilidade cadastrada e perfil de risco. A diversificação combina quantidade de ativos, quantidade de classes e concentração; a concentração combina concentração máxima e HHI; o risco usa volatilidade média ponderada, desalinhamento com a tolerância do perfil e concentração estrutural. Os pesos configuráveis são diversificação 25%, risco 30%, concentração 25% e performance 20%.
@@ -144,6 +148,7 @@ O banco principal é MySQL. O Hibernate está configurado com `ddl-auto: none`; 
 - `V3__add_codigo_ativo.sql`: inclusão do código/ticker em `ativo`.
 - `V6__motor_score_e_agendamento.sql`: campos/versionamento do score e agendamento persistente com debounce.
 - `V7__dados_mercado_score_integral.sql`: séries históricas de mercado e classificação setorial administrável.
+- `V8__notificacao_score_email.sql`: estado idempotente das notificações de score.
 
 ### Segurança
 

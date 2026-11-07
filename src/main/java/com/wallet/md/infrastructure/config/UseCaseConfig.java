@@ -19,12 +19,14 @@ import com.wallet.md.application.usecase.carteira.AgendarRecalculoScoreUseCase;
 import com.wallet.md.application.usecase.carteira.ProcessarRecalculoScoreUseCase;
 import com.wallet.md.application.usecase.mercado.IngerirDadosMercadoUseCase;
 import com.wallet.md.application.usecase.notification.SendEmailUseCase;
+import com.wallet.md.application.usecase.notification.NotifyScoreRecalculatedUseCase;
 import com.wallet.md.application.usecase.ativo.GetAtivosPorTicket;
 import com.wallet.md.application.usecase.usuario.*;
 import com.wallet.md.domain.repository.carteira.*;
 import com.wallet.md.domain.repository.mercado.AtivoSetorRepository;
 import com.wallet.md.domain.repository.mercado.MarketSeriesRepository;
 import com.wallet.md.domain.repository.mercado.MarketDataProvider;
+import com.wallet.md.domain.repository.notification.ScoreEmailNotificationRepository;
 import com.wallet.md.domain.repository.ativo.CotacaoAtivoRepository;
 import com.wallet.md.domain.repository.ativo.AtivoRepository;
 import com.wallet.md.domain.repository.usuario.UsuarioRepository;
@@ -158,9 +160,10 @@ public class UseCaseConfig {
             CarteiraRepository carteiraRepository,
             CalcularScoreCarteiraUseCase calcularScoreCarteiraUseCase,
             GerarRecomendacoesCarteiraUseCase gerarRecomendacoesCarteiraUseCase,
-            com.wallet.md.infrastructure.config.ScoreMetodologiaProperties properties) {
+            com.wallet.md.infrastructure.config.ScoreMetodologiaProperties properties,
+            org.springframework.context.ApplicationEventPublisher eventPublisher) {
         return new ProcessarRecalculoScoreUseCase(recalculoScoreRepository, carteiraRepository,
-                calcularScoreCarteiraUseCase, gerarRecomendacoesCarteiraUseCase, properties);
+                calcularScoreCarteiraUseCase, gerarRecomendacoesCarteiraUseCase, properties, eventPublisher);
     }
 
     @Bean
@@ -177,6 +180,16 @@ public class UseCaseConfig {
     public SendEmailUseCase sendEmailUseCase(
             com.wallet.md.domain.repository.notification.EmailSenderPort emailSenderPort) {
         return new SendEmailUseCase(emailSenderPort);
+    }
+
+    @Bean
+    public NotifyScoreRecalculatedUseCase notifyScoreRecalculatedUseCase(
+            ScoreEmailNotificationRepository notificationRepository,
+            CarteiraRepository carteiraRepository,
+            com.wallet.md.domain.repository.usuario.UsuarioRepository usuarioRepository,
+            SendEmailUseCase sendEmailUseCase) {
+        return new NotifyScoreRecalculatedUseCase(notificationRepository, carteiraRepository,
+                usuarioRepository, sendEmailUseCase);
     }
 
     @Bean
